@@ -26,8 +26,23 @@ void interrupt_handler(int signal) {
 void on_connection(int client_socket) {
     fprintf(stderr, "Got a connection!\n");
 
-    const char* result = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 13\r\n\r\nHello World!\r\n";
-    write(client_socket, result, strlen(result));
+    const char* content = "Hello, World!";
+    const size_t content_length = strlen(content);
+
+    char content_length_str[21];
+    sprintf(content_length_str, "%zu", content_length);
+
+    struct string response = new_string("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ");
+    string_append_literal(&response, content_length_str);
+    string_append_literal(&response, "\r\n\r\n");
+    string_append_literal(&response, content);
+    string_append_literal(&response, "\r\n");
+
+    fprintf(stderr, "[DEBUG]: Here is the response body: %s\n", response.data);
+
+    write(client_socket, response.data, response.length);
+
+    free_string(&response);
 }
 
 int main(void) {
