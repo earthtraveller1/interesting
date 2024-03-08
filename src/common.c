@@ -10,6 +10,8 @@ struct string new_string(const char* p_literal) {
     string.length = strlen(p_literal) + 1;
     string.capacity = string.length;
     string.data = malloc(string.capacity);
+
+    memset(string.data, 0, string.capacity);
     memcpy(string.data, p_literal, string.length);
 
     return string;
