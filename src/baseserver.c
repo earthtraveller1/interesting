@@ -16,6 +16,7 @@ struct server_error create_baseserver(uint16_t port, uint32_t p_address) {
 
     server.server.socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (server.server.socket < 0) {
+        fprintf(stderr, "ERROR: Failed to create socket\n");
         server.error = ERROR_SOCKET_CREATION_FAILED;
         return server;
     }
@@ -27,6 +28,7 @@ struct server_error create_baseserver(uint16_t port, uint32_t p_address) {
     address.sin_port = htons(port);
 
     if (bind(server.server.socket, (struct sockaddr *)&address, sizeof(address)) < 0) {
+        fprintf(stderr, "ERROR: Failed to bind socket\n");
         server.error = ERROR_SOCKET_BIND_FAILED;
         return server;
     }
@@ -36,6 +38,7 @@ struct server_error create_baseserver(uint16_t port, uint32_t p_address) {
 
 enum error run_baseserver(const struct baseserver* p_server) {
     if (listen(p_server->socket, SOMAXCONN) < 0) {
+        fprintf(stderr, "ERROR: Failed to listen on socket\n");
         return ERROR_SOCKET_LISTEN_FAILED;
     }
 
