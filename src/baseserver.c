@@ -21,6 +21,8 @@ struct server_error create_baseserver(uint16_t port, uint32_t p_address) {
         return server;
     }
 
+    setsockopt(server.server.socket, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int));
+
     struct sockaddr_in address;
     memset(&address, 0, sizeof(address));
     address.sin_family = AF_INET;
