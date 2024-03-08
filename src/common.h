@@ -24,6 +24,9 @@ void string_append_literal(struct string* string, const char* literal);
 
 void string_concat(struct string* string, const struct string* other);
 
+#define max(a, b) (((a) > (b)) ? (a) : (b))
+#define string_get_tail(string, from_index) ((string)->data + (string)->length - max(0, (from_index)))
+
 void free_string(const struct string* string);
 
 #endif
