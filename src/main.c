@@ -37,14 +37,11 @@ void on_connection(int client_socket) {
         read_amount = recv(client_socket, &character, 1, 0);
         string_append_char(&request_string, character);
         const char* tail_of_request = string_get_tail(&request_string, 5);
-        fprintf(stderr, "[debug]: tail of request: %s\n", tail_of_request);
 
         if (strcmp(tail_of_request, "\r\n\r\n") == 0) {
             break;
         }
     } while (read_amount > 0);
-
-    fprintf(stderr, "[debug]: Done reading from socket\n");
 
     if (read_amount < 0) {
         fprintf(stderr, "ERROR: Failed to read from socket\n");
@@ -67,7 +64,6 @@ void on_connection(int client_socket) {
 
     const struct string response_string = serialize_http_response(&response);
     send(client_socket, response_string.data, response_string.length, 0);
-    fprintf(stderr, "DEBUG:\n%s\n", response_string.data);
     close(client_socket);
 }
 
