@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
 
@@ -19,4 +21,22 @@ struct string serialize_http_response(const struct http_response* response) {
     string_append_literal(&string, response->body);
 
     return string;
+}
+
+struct http_request parse_http_request(const char* p_request_str) {
+    struct http_request request = {0};
+
+    char* request_str = malloc(sizeof(char) * (strlen(p_request_str) + 1));
+    strcpy(request_str, p_request_str);
+
+    char* tokenizer = NULL;
+    char* first_line = strtok_r(request_str, "\r\n", &tokenizer);
+
+    char* method = strtok_r(first_line, " ", &tokenizer);
+    char* path = strtok_r(NULL, " ", &tokenizer);
+
+    request.method = new_string(method);
+    request.path = new_string(path);
+
+    return request;
 }
