@@ -23,7 +23,8 @@ void string_append_char(struct string* p_string, char p_char) {
         p_string->data = realloc(p_string->data, p_string->capacity);
     }
 
-    p_string->data[p_string->length] = p_char;
+    p_string->data[p_string->length - 1] = p_char;
+    p_string->data[p_string->length] = 0;
     p_string->length += 1;
 }
 
