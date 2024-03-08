@@ -10,6 +10,6 @@ struct http_response {
     const char* body;
 };
 
-struct string serialize_http_response(struct http_response* response);
+struct string serialize_http_response(const struct http_response* response);
 
 #endif
