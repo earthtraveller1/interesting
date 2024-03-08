@@ -65,7 +65,6 @@ void on_connection(int client_socket) {
         .body = body.data
     };
 
-
     const struct string response_string = serialize_http_response(&response);
     send(client_socket, response_string.data, response_string.length, 0);
     fprintf(stderr, "DEBUG:\n%s\n", response_string.data);
