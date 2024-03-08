@@ -27,11 +27,11 @@ void interrupt_handler(int signal) {
 void on_connection(int client_socket) {
     fprintf(stderr, "Client connected: %d\n", client_socket);
 
-    const char* body = "Hello, World!";
+    const char* body = "<!DOCTYPE html><html><head><title>Hello, World!</title></head><body><h1>Hello, World!</h1><p>Hello, World!</p></body></html>";
 
     const struct http_response response = {
         .status = "200 OK",
-        .content_type = "text/plain",
+        .content_type = "text/html",
         .content_length = strlen(body),
         .body = body
     };
