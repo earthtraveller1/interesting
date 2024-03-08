@@ -28,15 +28,6 @@ void interrupt_handler(int signal) {
 void on_connection(int client_socket) {
     fprintf(stderr, "Client connected: %d\n", client_socket);
 
-    const char* body = "<!DOCTYPE html><html><head><title>Hello, World!</title></head><body><h1>Hello, World!</h1><p>Hello, World!</p></body></html>";
-
-    const struct http_response response = {
-        .status = "200 OK",
-        .content_type = "text/html",
-        .content_length = strlen(body),
-        .body = body
-    };
-
     struct string request_string = {0};
 
     size_t read_amount = 0;
@@ -62,9 +53,18 @@ void on_connection(int client_socket) {
     }
 
     const struct http_request request = parse_http_request(request_string.data);
-    fprintf(stderr, "DEBUG: Request: %s\n", request_string.data);
-    fprintf(stderr, "DEBUG: Method: %s\n", request.method.data);
-    fprintf(stderr, "DEBUG: Path: %s\n", request.path.data);
+
+    struct string body = new_string("<!DOCTYPE html><html><head><title>Hello, World!</title></head><body><h1>");
+    string_concat(&body, &request.path);
+    string_append_literal(&body, "</h1><p>Hello, World!</p></body></html>");
+
+    const struct http_response response = {
+        .status = "200 OK",
+        .content_type = "text/html",
+        .content_length = body.length,
+        .body = body.data
+    };
+
 
     const struct string response_string = serialize_http_response(&response);
     send(client_socket, response_string.data, response_string.length, 0);
