@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <math.h>
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -44,7 +45,13 @@ void on_connection(int client_socket) {
     do {
         read_amount = recv(client_socket, &character, 1, 0);
         string_append_char(&request_string, character);
-    } while (read_amount > 0 && character != '\n');
+        const char* tail_of_request = string_get_tail(&request_string, 5);
+        fprintf(stderr, "[debug]: tail of request: %s\n", tail_of_request);
+
+        if (strcmp(tail_of_request, "\r\n\r\n") == 0) {
+            break;
+        }
+    } while (read_amount > 0);
 
     fprintf(stderr, "[debug]: Done reading from socket\n");
 
