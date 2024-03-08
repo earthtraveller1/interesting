@@ -18,6 +18,11 @@ struct string new_string(const char* p_literal) {
 }
 
 void string_append_char(struct string* p_string, char p_char) {
+    if (p_string->capacity == 0) {
+        p_string->capacity = 1;
+        p_string->data = malloc(p_string->capacity);
+    }
+
     if (p_string->length == p_string->capacity) {
         p_string->capacity *= 2;
         p_string->data = realloc(p_string->data, p_string->capacity);
