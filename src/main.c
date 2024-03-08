@@ -36,6 +36,29 @@ void on_connection(int client_socket) {
         .body = body
     };
 
+    struct string request_string = {0};
+
+    size_t read_amount = 0;
+    char character;
+
+    do {
+        read_amount = recv(client_socket, &character, 1, 0);
+        string_append_char(&request_string, character);
+    } while (read_amount > 0 && character != '\n');
+
+    fprintf(stderr, "[debug]: Done reading from socket\n");
+
+    if (read_amount < 0) {
+        fprintf(stderr, "ERROR: Failed to read from socket\n");
+        close(client_socket);
+        return;
+    }
+
+    const struct http_request request = parse_http_request(request_string.data);
+    fprintf(stderr, "DEBUG: Request: %s\n", request_string.data);
+    fprintf(stderr, "DEBUG: Method: %s\n", request.method.data);
+    fprintf(stderr, "DEBUG: Path: %s\n", request.path.data);
+
     const struct string response_string = serialize_http_response(&response);
     send(client_socket, response_string.data, response_string.length, 0);
     fprintf(stderr, "DEBUG:\n%s\n", response_string.data);
