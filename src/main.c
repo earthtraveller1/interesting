@@ -10,6 +10,7 @@
 
 #include "common.h"
 #include "baseserver.h"
+#include "http.h"
 
 #define PORT 6969
 
@@ -24,25 +25,21 @@ void interrupt_handler(int signal) {
 }
 
 void on_connection(int client_socket) {
-    fprintf(stderr, "Got a connection!\n");
+    fprintf(stderr, "Client connected: %d\n", client_socket);
 
-    const char* content = "Hello, World!";
-    const size_t content_length = strlen(content);
+    const char* body = "Hello, World!";
 
-    char content_length_str[21];
-    sprintf(content_length_str, "%zu", content_length);
+    const struct http_response response = {
+        .status = "200 OK",
+        .content_type = "text/plain",
+        .content_length = strlen(body),
+        .body = body
+    };
 
-    struct string response = new_string("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ");
-    string_append_literal(&response, content_length_str);
-    string_append_literal(&response, "\r\n\r\n");
-    string_append_literal(&response, content);
-    string_append_literal(&response, "\r\n");
-
-    fprintf(stderr, "[DEBUG]: Here is the response body: %s\n", response.data);
-
-    write(client_socket, response.data, response.length);
-
-    free_string(&response);
+    const struct string response_string = serialize_http_response(&response);
+    send(client_socket, response_string.data, response_string.length, 0);
+    fprintf(stderr, "DEBUG:\n%s\n", response_string.data);
+    close(client_socket);
 }
 
 int main(void) {
