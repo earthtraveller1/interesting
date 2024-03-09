@@ -2,6 +2,7 @@
 #define INCLUDED_COMMON_H
 
 #include <stddef.h>
+#include <stdbool.h>
 
 enum error {
     ERROR_SUCCESS = 0,
@@ -24,8 +25,7 @@ void string_append_literal(struct string* string, const char* literal);
 
 void string_concat(struct string* string, const struct string* other);
 
-#define max(a, b) (((a) > (b)) ? (a) : (b))
-#define string_get_tail(string, from_index) ((string)->data + max((string)->length - (from_index), 0))
+bool string_ends_with(struct string* string, const char* suffix);
 
 void free_string(const struct string* string);
 

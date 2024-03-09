@@ -48,6 +48,16 @@ void string_concat(struct string* p_string, const struct string* p_other) {
     string_append_literal(p_string, p_other->data);
 }
 
+bool string_ends_with(struct string* p_string, const char* p_suffix) {
+    const size_t suffix_length = strlen(p_suffix);
+
+    if (p_string->length < suffix_length) {
+        return false;
+    }
+
+    return strcmp(p_string->data + p_string->length - suffix_length, p_suffix) == 0;
+}
+
 void free_string(const struct string* p_string) {
     free(p_string->data);
 }
