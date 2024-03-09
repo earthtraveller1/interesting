@@ -55,7 +55,7 @@ bool string_ends_with(struct string* p_string, const char* p_suffix) {
         return false;
     }
 
-    return strcmp(p_string->data + p_string->length - suffix_length, p_suffix) == 0;
+    return strcmp(p_string->data + p_string->length - suffix_length - 1, p_suffix) == 0;
 }
 
 void free_string(const struct string* p_string) {
