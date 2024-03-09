@@ -36,9 +36,8 @@ void on_connection(int client_socket) {
     do {
         read_amount = recv(client_socket, &character, 1, 0);
         string_append_char(&request_string, character);
-        const char* tail_of_request = string_get_tail(&request_string, 5);
 
-        if (strcmp(tail_of_request, "\r\n\r\n") == 0) {
+        if (string_ends_with(&request_string, "\r\n\r\n")) {
             break;
         }
     } while (read_amount > 0);
