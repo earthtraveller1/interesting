@@ -2,14 +2,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <string.h>
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <config.h>
+
 #include "common.h"
 #include "baseserver.h"
 #include "http.h"
+
+#ifdef INTERESTING_BUILD_TESTS
+#include "testing.h"
+#endif
 
 #define PORT 6969
 
@@ -70,7 +77,12 @@ void on_connection(int client_socket) {
     free_string(&response_string);
 }
 
-int main(void) {
+int main(int argc, char** argv) {
+#ifdef INTERESTING_BUILD_TESTS
+    if (argc > 1 && strcmp(argv[1], "test") == 0) {
+        return run_tests();
+    }
+#endif
     const struct server_error server_error = create_baseserver(PORT, INADDR_ANY);
     if (server_error.error != ERROR_SUCCESS) {
         return 1;
