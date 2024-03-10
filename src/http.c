@@ -46,7 +46,7 @@ struct http_request parse_http_request(const char* p_request_str) {
     char* line;
     while ((line = strtok_r(NULL, "\r\n", &tokenizer)) != NULL) {
         char* name = strtok_r(line, ": ", &line_tokenizer);
-        char* value = strtok_r(NULL, "\r\n", &line_tokenizer);
+        char* value = strtok_r(NULL, ": ", &line_tokenizer);
 
         struct http_header http_header = new_http_header(name, value);
         http_headers_append(&request.headers, &http_header);
