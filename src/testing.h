@@ -23,4 +23,6 @@
         }\
     } while (0)
 
+void run_tests(void);
+
 #endif
