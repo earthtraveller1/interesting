@@ -40,3 +40,8 @@ struct http_request parse_http_request(const char* p_request_str) {
 
     return request;
 }
+
+void free_http_request(const struct http_request* request) {
+    free_string(&request->method);
+    free_string(&request->path);
+}

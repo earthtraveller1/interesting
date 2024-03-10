@@ -21,4 +21,6 @@ struct string serialize_http_response(const struct http_response* response);
 
 struct http_request parse_http_request(const char* request_str);
 
+void free_http_request(const struct http_request* request);
+
 #endif
