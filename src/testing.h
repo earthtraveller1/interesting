@@ -1,6 +1,9 @@
 #ifndef INCLUDED_TESTING_H
 #define INCLUDED_TESTING_H
 
+#include <stdio.h>
+#include <stdbool.h>
+
 #define STRINGIFY(x) #x
 #define test_assert(expr)\
     do {\
