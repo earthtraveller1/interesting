@@ -6,6 +6,13 @@
 
 #include "http.h"
 
+struct http_header new_http_header(const char* name, const char* value) {
+    return (struct http_header) {
+        .name = new_string(name),
+        .value = new_string(value),
+    };
+}
+
 struct string serialize_http_response(const struct http_response* response) {
     struct string string = new_string("HTTP/1.1 ");
     string_append_literal(&string, response->status);
