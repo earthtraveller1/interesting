@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #define STRINGIFY(x) #x
 #define test_assert(expr)\
@@ -18,11 +19,12 @@
         fprintf(stderr, "running test " name "\t\t\t.........");\
         if (!test()) {\
             fprintf(stderr, "\033[91mfailed\033[0m\n");\
+            return EXIT_FAILURE;\
         } else {\
             fprintf(stderr, "\033[92mpassed\033[0m\n");\
         }\
     } while (0)
 
-void run_tests(void);
+int run_tests(void);
 
 #endif

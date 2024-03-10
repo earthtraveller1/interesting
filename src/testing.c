@@ -27,8 +27,10 @@ static bool http_parser_test(void) {
     return true;
 }
 
-void run_tests(void) {
+int run_tests(void) {
     run_test("http_parser_test", http_parser_test);
+
+    return 0;
 }
 
 #endif
