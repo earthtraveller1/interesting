@@ -34,6 +34,8 @@ struct string serialize_http_response(const struct http_response* response);
 
 struct http_request parse_http_request(const char* request_str);
 
+// Note, the ownership of header is transferred to the headers object after this call
+// Do not free the header after this call, as free_http_headers will do it for you
 void http_headers_append(struct http_headers* headers, const struct http_header* header);
 
 void free_http_request(const struct http_request* request);
