@@ -39,11 +39,23 @@ struct http_request parse_http_request(const char* p_request_str) {
     char* tokenizer = NULL;
     char* first_line = strtok_r(request_str, "\r\n", &tokenizer);
 
-    char* method = strtok_r(first_line, " ", &tokenizer);
-    char* path = strtok_r(NULL, " ", &tokenizer);
+    char* line_tokenizer = NULL;
+    char* method = strtok_r(first_line, " ", &line_tokenizer);
+    char* path = strtok_r(NULL, " ", &line_tokenizer);
+
+    char* line;
+    while ((line = strtok_r(NULL, "\r\n", &tokenizer)) != NULL) {
+        char* name = strtok_r(line, ": ", &line_tokenizer);
+        char* value = strtok_r(NULL, "\r\n", &line_tokenizer);
+
+        struct http_header http_header = new_http_header(name, value);
+        http_headers_append(&request.headers, &http_header);
+    }
 
     request.method = new_string(method);
     request.path = new_string(path);
+
+    free(request_str);
 
     return request;
 }

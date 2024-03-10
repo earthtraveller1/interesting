@@ -19,6 +19,8 @@ struct http_headers {
 struct http_request {
     struct string method;
     struct string path;
+
+    struct http_headers headers;
 };
 
 struct http_response {
