@@ -5,11 +5,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define STRINGIFY(x) #x
 #define test_assert(expr)\
     do {\
         if (!(expr)) {\
-            fprintf(stderr, "assertion failed at " __FILE__ ":" STRINGIFY(__LINE__) "\n");\
+            fprintf(stderr, "\nassertion failed at " __FILE__ ":%d", __LINE__);\
             return false;\
         }\
     } while (0)
@@ -18,7 +17,7 @@
     do {\
         fprintf(stderr, "running test " name "\t\t\t.........");\
         if (!test()) {\
-            fprintf(stderr, "\033[91mfailed\033[0m\n");\
+            fprintf(stderr, "\n\033[91m" name " failed\033[0m\n");\
             return EXIT_FAILURE;\
         } else {\
             fprintf(stderr, "\033[92mpassed\033[0m\n");\
