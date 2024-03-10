@@ -10,4 +10,14 @@
         }\
     } while (0)
 
+#define run_test(name, test)\
+    do {\
+        fprintf(stderr, "running test " name "\t\t\t.........");\
+        if (!test()) {\
+            fprintf(stderr, "\033[91mfailed\033[0m\n");\
+        } else {\
+            fprintf(stderr, "\033[92mpassed\033[0m\n");\
+        }\
+    } while (0)
+
 #endif
