@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(interesting)
+project(interesting LANGUAGES C)
 
 option(INTERESTING_BUILD_TESTS "Build tests" ON)
 
