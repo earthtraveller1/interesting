@@ -41,7 +41,40 @@ struct http_request parse_http_request(const char* p_request_str) {
     return request;
 }
 
+void http_headers_append(struct http_headers* p_headers, const struct http_header* p_header) {
+    if (p_headers->capacity == 0) {
+        p_headers->capacity = 16;
+        p_headers->length = 0; // This is for safety, in case length isn't 0 for some reasons.
+        p_headers->headers = malloc(sizeof(struct http_header) * p_headers->capacity);
+    }
+
+    if (p_headers->length == p_headers->capacity) {
+        p_headers->capacity *= 2;
+        p_headers->headers = realloc(p_headers->headers, sizeof(struct http_header) * p_headers->capacity);
+    }
+
+    p_headers->headers[p_headers->length] = *p_header;
+    p_headers->length++;
+}
+
 void free_http_request(const struct http_request* request) {
     free_string(&request->method);
     free_string(&request->path);
+}
+
+void free_http_header(const struct http_header* header) {
+    free_string(&header->name);
+    free_string(&header->value);
+}
+
+void free_http_headers(const struct http_headers* headers) {
+    for (
+        const struct http_header* header = headers->headers; 
+        header < headers->headers + headers->length; 
+        header++
+    ) {
+        free_http_header(header);
+    }
+
+    free(headers->headers);
 }
