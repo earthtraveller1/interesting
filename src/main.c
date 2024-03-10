@@ -64,6 +64,12 @@ void on_connection(int client_socket) {
     const struct string response_string = serialize_http_response(&response);
     send(client_socket, response_string.data, response_string.length, 0);
     close(client_socket);
+
+    free_http_request(&request);
+
+    free_string(&body);
+    free_string(&request_string);
+    free_string(&response_string);
 }
 
 int main(void) {
