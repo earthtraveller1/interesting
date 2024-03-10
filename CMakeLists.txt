@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(interesting)
 
+option(INTERESTING_BUILD_TESTS "Build tests" ON)
+
 aux_source_directory(src SOURCES)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
@@ -10,3 +12,6 @@ if (MSVC)
 else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
 endif()
+
+configure_file(cmake/config.ini config.h)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR})
