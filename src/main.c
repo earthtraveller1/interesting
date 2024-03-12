@@ -20,6 +20,7 @@
 #define PORT 6969
 
 static struct http_server global_server;
+static struct string global_404_page;
 
 static void interrupt_handler(int signal) {
     (void)signal;
@@ -39,29 +40,23 @@ static struct http_response on_request(const struct http_request* request) {
         string_concat(&page_path, &request->path);
     }
 
-    FILE* page_file = fopen(page_path.data, "r");
-    if (page_file == NULL) {
-        response.status = "500 Internal Server Error";
-        response.content_type = "text/plain";
-        response.content_length = 0;
+    const struct string_error page_content = read_string_from_file(page_path.data);
+    if (page_content.error != ERROR_SUCCESS) {
+        // Creates a new copy of the 404 page, because we don't want the original one to be freed!
+        const struct string page_404 = new_string(global_404_page.data);
 
-        fprintf(stderr, "[ERROR]: Failed to open %s\n", page_path.data);
+        response.status = "404 Not Found";
+        response.content_type = "text/html";
+        response.content_length = page_404.length;
+        response.body = page_404;
 
         return response;
     }
 
-    char character;
-    struct string page_content = {0};
-
-    do {
-        character = fgetc(page_file);
-        string_append_char(&page_content, character);
-    } while (character != EOF);
-
     response.status = "200 OK";
     response.content_type = "text/html";
-    response.content_length = page_content.length;
-    response.body = page_content;
+    response.content_length = page_content.string.length;
+    response.body = page_content.string;
 
     free_string(&page_path);
 
@@ -79,7 +74,14 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    const struct string_error page_404 = read_string_from_file("pages/404.html");
+    if (page_404.error != ERROR_SUCCESS) {
+        return 1;
+    }
+
     global_server = http_server.server;
+    global_404_page = page_404.string;
+
     global_server.on_request = on_request;
     
     signal(SIGINT, interrupt_handler);
