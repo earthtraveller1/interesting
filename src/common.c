@@ -38,6 +38,8 @@ void string_append_char(struct string* p_string, char p_char) {
 }
 
 void string_append_literal(struct string* p_string, const char* p_literal) {
+    if (!p_literal) return;
+
     for (const char* c = p_literal; *c; c++) {
         string_append_char(p_string, *c);
     }
