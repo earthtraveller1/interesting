@@ -76,6 +76,19 @@ void http_headers_append(struct http_headers* p_headers, const struct http_heade
     p_headers->length++;
 }
 
+struct http_server_error create_http_server(uint16_t p_port, uint32_t p_address) {
+    struct http_server_error server = {0};
+
+    const struct server_error base_server = create_baseserver(p_port, p_address);
+    if (base_server.error != ERROR_SUCCESS) {
+        server.error = base_server.error;
+        return server;
+    }
+
+    server.server.base_server = base_server.server;
+    return server;
+}
+
 void free_http_request(const struct http_request* request) {
     free_string(&request->method);
     free_string(&request->path);
