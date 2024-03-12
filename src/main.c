@@ -65,7 +65,7 @@ void on_connection(int client_socket, void* user_pointer) {
         .status = "200 OK",
         .content_type = "text/html",
         .content_length = body.length,
-        .body = body.data
+        .body = body
     };
 
     const struct string response_string = serialize_http_response(&response);

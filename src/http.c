@@ -28,7 +28,7 @@ struct string serialize_http_response(const struct http_response* response) {
     string_append_literal(&string, content_length_string);
 
     string_append_literal(&string, "\r\n\r\n");
-    string_append_literal(&string, response->body);
+    string_append_literal(&string, response->body.data);
 
     return string;
 }
@@ -150,7 +150,7 @@ static void on_connection(int client_socket, void* user_pointer) {
     } else {
         response.status = "200 OK";
         response.content_type = "text/html";
-        response.body = 
+        response.body = new_string(
             "<!DOCTYPE html>"
             "<html>"
             "<head>"
@@ -160,7 +160,8 @@ static void on_connection(int client_socket, void* user_pointer) {
             "<h1>Request Handler not set</h1>"
             "<p>The request handler for the HTTP server has not been set.</p>"
             "</body>"
-            "</html>";
+            "</html>"
+        );
     }
 
     struct string response_string = serialize_http_response(&response);

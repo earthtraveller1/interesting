@@ -28,7 +28,7 @@ struct http_response {
     const char* status;
     const char* content_type;
     size_t content_length;
-    const char* body;
+    struct string body;
 };
 
 typedef struct http_response (*request_handler)(const struct http_request* request);
