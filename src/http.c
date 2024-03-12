@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 
 #include "common.h"
 
 #include "http.h"
+
+static void on_connection(int client_socket, void* user_pointer);
 
 struct http_header new_http_header(const char* name, const char* value) {
     return (struct http_header) {
@@ -86,10 +89,13 @@ struct http_server_error create_http_server(uint16_t p_port, uint32_t p_address)
     }
 
     server.server.base_server = base_server.server;
+    server.server.base_server.on_connection = on_connection;
     return server;
 }
 
-enum error run_http_server(const struct http_server* p_server) {
+enum error run_http_server(struct http_server* p_server) {
+    p_server->base_server.user_pointer = p_server;
+
     enum error error = run_baseserver(&p_server->base_server);
     if (error != ERROR_SUCCESS) {
         fprintf(stderr, "ERROR: Failed to run server\n");
@@ -122,4 +128,45 @@ void free_http_headers(const struct http_headers* headers) {
     }
 
     free(headers->headers);
+}
+
+static void on_connection(int client_socket, void* user_pointer) {
+    struct http_server* server = (struct http_server*)user_pointer;
+
+    struct string request_string = {0};
+
+    while (!string_ends_with(&request_string, "\r\n\r\n")) {
+        char character;
+        recv(client_socket, &character, 1, 0);
+        string_append_char(&request_string, character);
+    }
+
+    const struct http_request http_request = parse_http_request(request_string.data);
+
+    struct http_response response = {0};
+
+    if (server->on_request != NULL) {
+        response = server->on_request(&http_request);
+    } else {
+        response.status = "200 OK";
+        response.content_type = "text/html";
+        response.body = 
+            "<!DOCTYPE html>"
+            "<html>"
+            "<head>"
+            "<title>Request Handler not Set</title>"
+            "</head>"
+            "<body>"
+            "<h1>Request Handler not set</h1>"
+            "<p>The request handler for the HTTP server has not been set.</p>"
+            "</body>"
+            "</html>";
+    }
+
+    struct string response_string = serialize_http_response(&response);
+    send(client_socket, response_string.data, response_string.length, 0);
+
+    free_string(&response_string);
+    free_string(&request_string);
+    free_http_request(&http_request);
 }
