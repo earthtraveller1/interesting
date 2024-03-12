@@ -5,11 +5,12 @@
 
 #include "common.h"
 
-typedef void (*on_connection_t)(int client_socket);
+typedef void (*on_connection_t)(int client_socket, void* user_pointer);
 
 struct baseserver {
     int socket;
     on_connection_t on_connection;
+    void* user_pointer;
 };
 
 struct server_error {

@@ -30,8 +30,10 @@ void interrupt_handler(int signal) {
     exit(0);
 }
 
-void on_connection(int client_socket) {
+void on_connection(int client_socket, void* user_pointer) {
     fprintf(stderr, "Client connected: %d\n", client_socket);
+
+    (void)user_pointer;
 
     struct string request_string = {0};
 
