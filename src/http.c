@@ -167,6 +167,7 @@ static void on_connection(int client_socket, void* user_pointer) {
     struct string response_string = serialize_http_response(&response);
     send(client_socket, response_string.data, response_string.length, 0);
 
+    free_string(&response.body);
     free_string(&response_string);
     free_string(&request_string);
     free_http_request(&http_request);
