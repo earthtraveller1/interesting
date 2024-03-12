@@ -31,7 +31,7 @@ struct http_response {
     const char* body;
 };
 
-typedef struct http_response (*request_handler)(struct http_request* request);
+typedef struct http_response (*request_handler)(const struct http_request* request);
 
 struct http_server {
     struct baseserver base_server;
@@ -55,7 +55,7 @@ void http_headers_append(struct http_headers* headers, const struct http_header*
 
 struct http_server_error create_http_server(uint16_t port, uint32_t p_address);
 
-enum error run_http_server(const struct http_server* server);
+enum error run_http_server(struct http_server* server);
 
 void free_http_server(struct http_server* server);
 
