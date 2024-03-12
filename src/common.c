@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "common.h"
 
@@ -15,6 +16,32 @@ struct string new_string(const char* p_literal) {
     memcpy(string.data, p_literal, string.length);
 
     return string;
+}
+
+struct string_error read_string_from_file(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        return (struct string_error) {
+            .error = ERROR_FILE_OPEN_FAILED,
+            .string = {0}
+        };
+    }
+
+    struct string string = {0};
+    while (true) {
+        char character = fgetc(file);
+
+        if (character == EOF) {
+            break;
+        }
+
+        string_append_char(&string, character);
+    }
+
+    return (struct string_error) {
+        .error = ERROR_SUCCESS,
+        .string = string
+    };
 }
 
 void string_append_char(struct string* p_string, char p_char) {

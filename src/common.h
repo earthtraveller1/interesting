@@ -8,7 +8,8 @@ enum error {
     ERROR_SUCCESS = 0,
     ERROR_SOCKET_CREATION_FAILED = 1,
     ERROR_SOCKET_BIND_FAILED = 2,
-    ERROR_SOCKET_LISTEN_FAILED = 3
+    ERROR_SOCKET_LISTEN_FAILED = 3,
+    ERROR_FILE_OPEN_FAILED = 4,
 };
 
 struct string {
@@ -17,7 +18,14 @@ struct string {
     size_t capacity;
 };
 
+struct string_error {
+    enum error error;
+    struct string string;
+};
+
 struct string new_string(const char* literal);
+
+struct string_error read_string_from_file(const char* filename);
 
 void string_append_char(struct string* string, char c);
 
