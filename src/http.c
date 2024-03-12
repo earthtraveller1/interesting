@@ -89,6 +89,19 @@ struct http_server_error create_http_server(uint16_t p_port, uint32_t p_address)
     return server;
 }
 
+enum error run_http_server(const struct http_server* p_server) {
+    enum error error = run_baseserver(&p_server->base_server);
+    if (error != ERROR_SUCCESS) {
+        fprintf(stderr, "ERROR: Failed to run server\n");
+    }
+
+    return error;
+}
+
+void free_http_server(struct http_server* p_server) {
+    destroy_baseserver(p_server->base_server);
+}
+
 void free_http_request(const struct http_request* request) {
     free_string(&request->method);
     free_string(&request->path);
