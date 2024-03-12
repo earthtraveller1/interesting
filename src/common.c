@@ -50,7 +50,7 @@ void string_concat(struct string* p_string, const struct string* p_other) {
 bool string_ends_with(struct string* p_string, const char* p_suffix) {
     const size_t suffix_length = strlen(p_suffix);
 
-    if (p_string->length < suffix_length) {
+    if (p_string->length <= suffix_length) {
         return false;
     }
 
