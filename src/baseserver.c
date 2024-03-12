@@ -50,7 +50,7 @@ enum error run_baseserver(const struct baseserver* p_server) {
             continue;
         }
 
-        p_server->on_connection(client_socket);
+        p_server->on_connection(client_socket, p_server->user_pointer);
 
         close(client_socket);
     }
