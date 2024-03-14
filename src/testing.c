@@ -44,9 +44,22 @@ static bool router_test(void) {
     return true;
 }
 
+static bool route_matching_test(void) {
+    struct parameters parameters = {0};
+    const struct route route = parse_route("/neng/li/{school}");
+
+    test_assert(match_route("/neng/li", &route, &parameters) == true);
+    test_assert(parameters.length == 1);
+    test_assert(strcmp(parameters.list[0].name.data, "school") == 0);
+    test_assert(strcmp(parameters.list[0].value.data, "neng") == 0);
+
+    return true;
+}
+
 int run_tests(void) {
     run_test("http_parser_test", http_parser_test);
     run_test("router_test", router_test);
+    run_test("route_matching_test", route_matching_test);
 
     return 0;
 }
