@@ -15,7 +15,7 @@
 
 #define run_test(test)\
     do {\
-        fprintf(stderr, "running test " #test "\t\t\t.........");\
+        fprintf(stderr, "running test " #test ".........");\
         if (!test()) {\
             fprintf(stderr, "\n\033[91m" #test " failed\033[0m\n");\
             return EXIT_FAILURE;\
