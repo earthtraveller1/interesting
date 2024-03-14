@@ -31,4 +31,6 @@ struct parameters {
 
 struct route parse_route(const char* format);
 
+bool match_route(const char* path, const struct route* route, struct parameters* parameters);
+
 #endif
