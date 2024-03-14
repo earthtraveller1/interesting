@@ -48,10 +48,10 @@ static bool route_matching_test(void) {
     struct parameters parameters = {0};
     const struct route route = parse_route("/neng/li/{school}");
 
-    test_assert(match_route("/neng/li", &route, &parameters) == true);
+    test_assert(match_route("/neng/li/oakville", &route, &parameters) == true);
     test_assert(parameters.length == 1);
     test_assert(strcmp(parameters.list[0].name.data, "school") == 0);
-    test_assert(strcmp(parameters.list[0].value.data, "neng") == 0);
+    test_assert(strcmp(parameters.list[0].value.data, "oakville") == 0);
 
     return true;
 }
