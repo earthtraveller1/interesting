@@ -93,3 +93,13 @@ bool match_route(const char* p_path, const struct route* p_route, struct paramet
 
     return true;
 }
+
+const struct string* get_parameter(const struct parameters* parameters, const char* name) {
+    for (const struct parameter* parameter = parameters->list; parameter < parameters->list + parameters->length; parameter++) {
+        if (strcmp(parameter->name.data, name) == 0) {
+            return &parameter->value;
+        }
+    }
+
+    return NULL;
+}

@@ -33,4 +33,7 @@ struct route parse_route(const char* format);
 
 bool match_route(const char* path, const struct route* route, struct parameters* parameters);
 
+// May return NULL, when the parameter does not exist
+const struct string* get_parameter(const struct parameters* parameters, const char* name);
+
 #endif
