@@ -34,7 +34,7 @@ struct route parse_route(const char* p_format) {
         if (part_str[0] == '{' && part_str[part_str_last_index] == '}') {
             part.type = ROUTE_PART_TYPE_PARAMETER;
             part_str++;
-            part_str[part_str_last_index] = 0;
+            part_str[part_str_last_index - 1] = 0;
         } else {
             part.type = ROUTE_PART_TYPE_CONSTANT;
         }
