@@ -57,9 +57,9 @@ static bool route_matching_test(void) {
 }
 
 int run_tests(void) {
-    run_test("http_parser_test", http_parser_test);
-    run_test("router_test", router_test);
-    run_test("route_matching_test", route_matching_test);
+    run_test(http_parser_test);
+    run_test(router_test);
+    run_test(route_matching_test);
 
     return 0;
 }

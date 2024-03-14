@@ -13,11 +13,11 @@
         }\
     } while (0)
 
-#define run_test(name, test)\
+#define run_test(test)\
     do {\
-        fprintf(stderr, "running test " name "\t\t\t.........");\
+        fprintf(stderr, "running test " #test "\t\t\t.........");\
         if (!test()) {\
-            fprintf(stderr, "\n\033[91m" name " failed\033[0m\n");\
+            fprintf(stderr, "\n\033[91m" #test " failed\033[0m\n");\
             return EXIT_FAILURE;\
         } else {\
             fprintf(stderr, "\033[92mpassed\033[0m\n");\
