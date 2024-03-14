@@ -6,12 +6,13 @@
 static void append_route_parts(struct route* p_route, const struct route_part* p_part) {
     if (p_route->parts_capacity == 0) {
         p_route->parts_length = 0;
+        p_route->parts_capacity = 1;
         p_route->parts = malloc(sizeof(struct route_part));
     }
 
     if (p_route->parts_capacity == p_route->parts_length) {
         p_route->parts_capacity *= 2;
-        p_route->parts = realloc(p_route->parts, p_route->parts_capacity);
+        p_route->parts = realloc(p_route->parts, p_route->parts_capacity * sizeof(struct route_part));
     }
 
     p_route->parts[p_route->parts_length] = *p_part;
@@ -24,8 +25,8 @@ struct route parse_route(const char* p_format) {
 
     struct route route = {0};
 
-    while (true) {
-        char* part_str = strtok_r(format.data, "/", &tokenizer);
+    char* part_str = strtok_r(format.data, "/", &tokenizer);
+    while (part_str != NULL) {
         const size_t part_str_last_index = strlen(part_str) - 1;
 
         struct route_part part = {0};
@@ -41,6 +42,7 @@ struct route parse_route(const char* p_format) {
         part.name = new_string(part_str);
 
         append_route_parts(&route, &part);
+        part_str = strtok_r(NULL, "/", &tokenizer);
     }
 
     free_string(&format);
