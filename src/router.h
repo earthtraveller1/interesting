@@ -29,4 +29,6 @@ struct parameters {
     size_t capacity;
 };
 
+struct route parse_route(const char* format);
+
 #endif
