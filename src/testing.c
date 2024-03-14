@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "http.h"
+#include "router.h"
 
 #ifdef INTERESTING_BUILD_TESTS
 
@@ -27,8 +28,25 @@ static bool http_parser_test(void) {
     return true;
 }
 
+static bool router_test(void) {
+    const char* route_str = "/hello/world/{seymour}";
+
+    const struct route route = parse_route(route_str);
+
+    test_assert(route.parts_length == 3);
+    test_assert(strcmp(route.parts[0].name.data, "hello") == 0);
+    test_assert(route.parts[0].type == ROUTE_PART_TYPE_CONSTANT);
+    test_assert(strcmp(route.parts[1].name.data, "world") == 0);
+    test_assert(route.parts[1].type == ROUTE_PART_TYPE_CONSTANT);
+    test_assert(strcmp(route.parts[2].name.data, "seymour") == 0);
+    test_assert(route.parts[2].type == ROUTE_PART_TYPE_PARAMETER);
+
+    return true;
+}
+
 int run_tests(void) {
     run_test("http_parser_test", http_parser_test);
+    run_test("router_test", router_test);
 
     return 0;
 }
