@@ -5,8 +5,8 @@
 
 struct route_part {
     enum type {
-        constant,
-        parameter,
+        ROUTE_PART_TYPE_CONSTANT,
+        ROUTE_PART_TYPE_PARAMETER
     } type;
 
     struct string name;
