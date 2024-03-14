@@ -1,0 +1,32 @@
+#ifndef INCLUDED_ROUTER_H
+#define INCLUDED_ROUTER_H
+
+#include "common.h"
+
+struct route_part {
+    enum type {
+        constant,
+        parameter,
+    } type;
+
+    struct string name;
+};
+
+struct route {
+    struct route_part* parts;
+    size_t parts_length;
+    size_t parts_capacity;
+};
+
+struct parameter {
+    struct string name;
+    struct string value;
+};
+
+struct parameters {
+    struct parameter* list;
+    size_t length;
+    size_t capacity;
+};
+
+#endif
