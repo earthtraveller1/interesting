@@ -6,15 +6,16 @@
 
 #ifdef _WIN32
 #else
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <unistd.h>
+// #include <arpa/inet.h>
+// #include <sys/socket.h>
+// #include <unistd.h>
 #endif
 
 #include <config.h>
 
 #include "common.h"
 #include "http.h"
+#include "router.h"
 
 #ifdef INTERESTING_BUILD_TESTS
 #include "testing.h"
@@ -23,6 +24,8 @@
 #define PORT 6969
 
 static struct http_server global_server;
+static struct router global_router;
+
 static struct string global_404_page;
 
 static void interrupt_handler(int signal) {
@@ -30,42 +33,43 @@ static void interrupt_handler(int signal) {
 
     fprintf(stderr, "Closing server...\n");
     free_http_server(&global_server);
+    free_router(&global_router);
     exit(0);
 }
 
 static struct http_response on_request(const struct http_request* request, void* user_data) {
+    const struct router* router = (const struct router*)user_data;
+    return route_request(router, request);
+}
+
+static struct http_response index_handler(const struct parameters* parameters, const struct http_request* request, void* user_data) {
+    (void)parameters;
+    (void)request;
     (void)user_data;
 
-    struct http_response response = {0};
+    const struct string_error page = read_string_from_file("pages/index.html");
 
-    struct string page_path = new_string("pages");
-    if (strcmp(request->path.data, "/") == 0) {
-        string_append_literal(&page_path, "/index.html");
-    } else {
-        string_concat(&page_path, &request->path);
-    }
+    return (struct http_response) {
+        .status = "200 OK",
+        .content_type = "text/html",
+        .content_length = page.string.length - 1,
+        .body = page.string,
+    };
+}
 
-    const struct string_error page_content = read_string_from_file(page_path.data);
-    if (page_content.error != INTERESTING_ERROR_SUCCESS) {
-        // Creates a new copy of the 404 page, because we don't want the original one to be freed!
-        const struct string page_404 = new_string(global_404_page.data);
+static struct http_response neng_handler(const struct parameters* parameters, const struct http_request* request, void* user_data) {
+    (void)parameters;
+    (void)request;
+    (void)user_data;
 
-        response.status = "404 Not Found";
-        response.content_type = "text/html";
-        response.content_length = page_404.length;
-        response.body = page_404;
+    const struct string_error page = read_string_from_file("pages/neng.html");
 
-        return response;
-    }
-
-    response.status = "200 OK";
-    response.content_type = "text/html";
-    response.content_length = page_content.string.length;
-    response.body = page_content.string;
-
-    free_string(&page_path);
-
-    return response;
+    return (struct http_response) {
+        .status = "200 OK",
+        .content_type = "text/html",
+        .content_length = page.string.length - 1,
+        .body = page.string,
+    };
 }
 
 int main(int argc, char** argv) {
@@ -79,6 +83,9 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    add_route_handler(&global_router, "/", index_handler);
+    add_route_handler(&global_router, "/neng", neng_handler);
+
     const struct string_error page_404 = read_string_from_file("pages/404.html");
     if (page_404.error != INTERESTING_ERROR_SUCCESS) {
         return 1;
@@ -88,6 +95,7 @@ int main(int argc, char** argv) {
     global_404_page = page_404.string;
 
     global_server.on_request = on_request;
+    global_server.user_data = &global_router;
     
     signal(SIGINT, interrupt_handler);
 
