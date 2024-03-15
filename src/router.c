@@ -103,3 +103,22 @@ const struct string* get_parameter(const struct parameters* parameters, const ch
 
     return NULL;
 }
+
+void add_route_handler(struct router* p_router, const char* p_route, route_handler_proc_t p_proc) {
+    if (p_router->handlers_capacity == 0) {
+        p_router->handlers_length = 0;
+        p_router->handlers_capacity = 1;
+        p_router->handlers = malloc(sizeof(struct route_handler));
+    }
+
+    if (p_router->handlers_capacity == p_router->handlers_length) {
+        p_router->handlers_capacity *= 2;
+        p_router->handlers = realloc(p_router->handlers, p_router->handlers_capacity * sizeof(struct route_handler));
+    }
+
+    const struct route route = parse_route(p_route);
+
+    p_router->handlers[p_router->handlers_length].route = route;
+    p_router->handlers[p_router->handlers_length].proc = p_proc;
+    p_router->handlers_length += 1;
+}
