@@ -91,7 +91,7 @@ struct http_server_error create_http_server(uint16_t p_port, uint32_t p_address)
     struct http_server_error server = {0};
 
     const struct server_error base_server = create_baseserver(p_port, p_address);
-    if (base_server.error != ERROR_SUCCESS) {
+    if (base_server.error != INTERESTING_ERROR_SUCCESS) {
         server.error = base_server.error;
         return server;
     }
@@ -105,7 +105,7 @@ enum error run_http_server(struct http_server* p_server) {
     p_server->base_server.user_pointer = p_server;
 
     enum error error = run_baseserver(&p_server->base_server);
-    if (error != ERROR_SUCCESS) {
+    if (error != INTERESTING_ERROR_SUCCESS) {
         fprintf(stderr, "ERROR: Failed to run server\n");
     }
 

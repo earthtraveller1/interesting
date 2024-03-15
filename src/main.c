@@ -44,7 +44,7 @@ static struct http_response on_request(const struct http_request* request) {
     }
 
     const struct string_error page_content = read_string_from_file(page_path.data);
-    if (page_content.error != ERROR_SUCCESS) {
+    if (page_content.error != INTERESTING_ERROR_SUCCESS) {
         // Creates a new copy of the 404 page, because we don't want the original one to be freed!
         const struct string page_404 = new_string(global_404_page.data);
 
@@ -73,12 +73,12 @@ int main(int argc, char** argv) {
     }
 #endif
     struct http_server_error http_server = create_http_server(PORT, 0);
-    if (http_server.error != ERROR_SUCCESS) {
+    if (http_server.error != INTERESTING_ERROR_SUCCESS) {
         return 1;
     }
 
     const struct string_error page_404 = read_string_from_file("pages/404.html");
-    if (page_404.error != ERROR_SUCCESS) {
+    if (page_404.error != INTERESTING_ERROR_SUCCESS) {
         return 1;
     }
 
