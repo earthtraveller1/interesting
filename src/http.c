@@ -73,12 +73,14 @@ struct http_request parse_http_request(const char* p_request_str) {
 
 void http_headers_append(struct http_headers* p_headers, const struct http_header* p_header) {
     if (p_headers->capacity == 0) {
+        // There tends to be quite a bit of headers, so why not start off with 16 capacity?
         p_headers->capacity = 16;
         p_headers->length = 0; // This is for safety, in case length isn't 0 for some reasons.
         p_headers->headers = malloc(sizeof(struct http_header) * p_headers->capacity);
     }
 
     if (p_headers->length == p_headers->capacity) {
+        // We double in size. I know we should add one half instead, but I don't see how that's better.
         p_headers->capacity *= 2;
         p_headers->headers = realloc(p_headers->headers, sizeof(struct http_header) * p_headers->capacity);
     }

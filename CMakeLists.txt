@@ -4,6 +4,8 @@ project(interesting LANGUAGES C)
 
 option(INTERESTING_BUILD_TESTS "Build tests" ON)
 
+# I know this isn't how you are supposed to do this, but fuck you, because guess what?
+# I don't give a shit.
 aux_source_directory(src SOURCES)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
