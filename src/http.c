@@ -41,7 +41,11 @@ struct http_request parse_http_request(const char* p_request_str) {
     struct http_request request = {0};
 
     char* request_str = malloc(sizeof(char) * (strlen(p_request_str) + 1));
+#ifdef _WIN32
+    strcpy_s(request_str, strlen(p_request_str) + 1, p_request_str);
+#else
     strcpy(request_str, p_request_str);
+#endif
 
     char* tokenizer = NULL;
     char* first_line = strtok_r(request_str, "\r\n", &tokenizer);

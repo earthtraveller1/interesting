@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 enum error {
-    ERROR_SUCCESS = 0,
+    INTERESTING_ERROR_SUCCESS = 0,
     ERROR_SOCKET_CREATION_FAILED = 1,
     ERROR_SOCKET_BIND_FAILED = 2,
     ERROR_SOCKET_LISTEN_FAILED = 3,
@@ -13,6 +13,10 @@ enum error {
     ERROR_WSA_STARTUP_FAILED = 5,
     ERROR_GETADDRINFO_FAILED = 6,
 };
+
+#ifdef _WIN32
+#define strtok_r strtok_s
+#endif
 
 struct string {
     char* data;

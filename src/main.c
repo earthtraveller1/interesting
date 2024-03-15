@@ -4,9 +4,12 @@
 #include <signal.h>
 #include <string.h>
 
+#ifdef _WIN32
+#else
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#endif
 
 #include <config.h>
 

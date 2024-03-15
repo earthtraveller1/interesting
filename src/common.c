@@ -39,7 +39,7 @@ struct string_error read_string_from_file(const char* filename) {
     }
 
     return (struct string_error) {
-        .error = ERROR_SUCCESS,
+        .error = INTERESTING_ERROR_SUCCESS,
         .string = string
     };
 }
