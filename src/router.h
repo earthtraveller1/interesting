@@ -63,4 +63,8 @@ void free_parameter(const struct parameter* parameter);
 
 void free_parameters(const struct parameters* parameters);
 
+void free_route_handler(const struct route_handler* handler);
+
+void free_router(const struct router* router);
+
 #endif

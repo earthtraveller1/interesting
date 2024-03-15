@@ -158,5 +158,19 @@ void free_parameters(const struct parameters* parameters) {
     for (const struct parameter* parameter = parameters->list; parameter < parameters->list + parameters->length; parameter++) {
         free_parameter(parameter);
     }
+
+    free(parameters->list);
+}
+
+void free_route_handler(const struct route_handler* handler) {
+    free_route(&handler->route);
+}
+
+void free_router(const struct router* router) {
+    for (const struct route_handler* handler = router->handlers; handler < router->handlers + router->handlers_length; handler++) {
+        free_route_handler(handler);
+    }
+
+    free(router->handlers);
 }
 
