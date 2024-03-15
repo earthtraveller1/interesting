@@ -72,16 +72,19 @@ bool match_route(const char* p_path, const struct route* p_route, struct paramet
     char* path_part = strtok_r(path.data, "/", &tokenizer);
 
     if (p_route->parts_length == 0) {
+        free_string(&path);
         return strcmp(p_path, "/") == 0;
     }
 
     for (const struct route_part* part = p_route->parts; part < p_route->parts + p_route->parts_length; part++) {
         if (path_part == NULL) {
+            free_string(&path);
             return false;
         }
 
         if (part->type == ROUTE_PART_TYPE_CONSTANT) {
             if (strcmp(path_part, part->name.data) != 0) {
+                free_string(&path);
                 return false;
             }
         } else if (part->type == ROUTE_PART_TYPE_PARAMETER) {
@@ -95,6 +98,7 @@ bool match_route(const char* p_path, const struct route* p_route, struct paramet
         path_part = strtok_r(NULL, "/", &tokenizer);
     }
 
+    free_string(&path);
     return true;
 }
 
@@ -133,6 +137,8 @@ struct http_response route_request(const struct router* router, const struct htt
         if (match_route(request->path.data, &handler->route, &parameters)) {
             return handler->proc(&parameters, request, router->user_data);
         }
+
+        free_parameters(&parameters);
     }
 
     return (struct http_response) {
