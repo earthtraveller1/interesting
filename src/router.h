@@ -38,7 +38,7 @@ struct route_handler {
 };
 
 struct router {
-    struct route_handlers* handlers;
+    struct route_handler* handlers;
     size_t handlers_length;
     size_t handlers_capacity;
     void* user_data;
