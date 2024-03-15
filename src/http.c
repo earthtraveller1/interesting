@@ -121,6 +121,7 @@ void free_http_server(struct http_server* p_server) {
 void free_http_request(const struct http_request* request) {
     free_string(&request->method);
     free_string(&request->path);
+    free_http_headers(&request->headers);
 }
 
 void free_http_header(const struct http_header* header) {

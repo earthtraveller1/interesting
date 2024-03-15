@@ -157,6 +157,8 @@ void free_route(const struct route* route) {
     for (const struct route_part* part = route->parts; part < route->parts + route->parts_length; part++) {
         free_route_part(part);
     }
+
+    free(route->parts);
 }
 
 void free_parameter(const struct parameter* parameter) {
