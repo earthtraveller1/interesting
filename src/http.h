@@ -31,11 +31,12 @@ struct http_response {
     struct string body;
 };
 
-typedef struct http_response (*request_handler)(const struct http_request* request);
+typedef struct http_response (*request_handler)(const struct http_request* request, void* user_data);
 
 struct http_server {
     struct baseserver base_server;
     request_handler on_request;
+    void* user_data;
 };
 
 struct http_server_error {

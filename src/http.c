@@ -156,7 +156,7 @@ static void on_connection(int client_socket, void* user_pointer) {
     struct http_response response = {0};
 
     if (server->on_request != NULL) {
-        response = server->on_request(&http_request);
+        response = server->on_request(&http_request, server->user_data);
     } else {
         response.status = "200 OK";
         response.content_type = "text/html";

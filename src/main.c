@@ -33,7 +33,9 @@ static void interrupt_handler(int signal) {
     exit(0);
 }
 
-static struct http_response on_request(const struct http_request* request) {
+static struct http_response on_request(const struct http_request* request, void* user_data) {
+    (void)user_data;
+
     struct http_response response = {0};
 
     struct string page_path = new_string("pages");
