@@ -19,8 +19,14 @@ struct string new_string(const char* p_literal) {
 }
 
 struct string_error read_string_from_file(const char* filename) {
+#ifdef _WIN32
+    FILE* file;
+    
+    if (fopen_s(&file, filename, "r") != 0) {
+#else
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
+#endif
         return (struct string_error) {
             .error = ERROR_FILE_OPEN_FAILED,
             .string = {0}
