@@ -123,12 +123,19 @@ void add_route_handler(struct router* p_router, const char* p_route, route_handl
     p_router->handlers_length += 1;
 }
 
-void route_request(const struct router* router, const struct http_request* request) {
+struct http_response route_request(const struct router* router, const struct http_request* request) {
     for (const struct route_handler* handler = router->handlers; handler < router->handlers + router->handlers_length; handler++) {
         struct parameters parameters = {0};
         if (match_route(request->path.data, &handler->route, &parameters)) {
-            handler->proc(&parameters, request, router->user_data);
+            return handler->proc(&parameters, request, router->user_data);
         }
     }
+
+    return (struct http_response) {
+        .status = "404 Not Found",
+        .content_type = "text/html",
+        .content_length = 0,
+        .body = (struct string) {0},
+    };
 }
 

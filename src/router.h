@@ -30,7 +30,7 @@ struct parameters {
     size_t capacity;
 };
 
-typedef void (*route_handler_proc_t)(const struct parameters* parameters, const struct http_request* request, void* user_data);
+typedef struct http_response (*route_handler_proc_t)(const struct parameters* parameters, const struct http_request* request, void* user_data);
 
 struct route_handler {
     route_handler_proc_t proc;
@@ -53,6 +53,6 @@ const struct string* get_parameter(const struct parameters* parameters, const ch
 
 void add_route_handler(struct router* router, const char* route, route_handler_proc_t proc);
 
-void route_request(const struct router* router, const struct http_request* request);
+struct http_response route_request(const struct router* router, const struct http_request* request);
 
 #endif
