@@ -55,4 +55,12 @@ void add_route_handler(struct router* router, const char* route, route_handler_p
 
 struct http_response route_request(const struct router* router, const struct http_request* request);
 
+void free_route_part(const struct route_part* part);
+
+void free_route(const struct route* route);
+
+void free_parameter(const struct parameter* parameter);
+
+void free_parameters(const struct parameters* parameters);
+
 #endif

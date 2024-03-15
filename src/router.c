@@ -139,3 +139,24 @@ struct http_response route_request(const struct router* router, const struct htt
     };
 }
 
+void free_route_part(const struct route_part* part) {
+    free_string(&part->name);
+}
+
+void free_route(const struct route* route) {
+    for (const struct route_part* part = route->parts; part < route->parts + route->parts_length; part++) {
+        free_route_part(part);
+    }
+}
+
+void free_parameter(const struct parameter* parameter) {
+    free_string(&parameter->name);
+    free_string(&parameter->value);
+}
+
+void free_parameters(const struct parameters* parameters) {
+    for (const struct parameter* parameter = parameters->list; parameter < parameters->list + parameters->length; parameter++) {
+        free_parameter(parameter);
+    }
+}
+
