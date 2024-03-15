@@ -71,6 +71,10 @@ bool match_route(const char* p_path, const struct route* p_route, struct paramet
     char* tokenizer = NULL;
     char* path_part = strtok_r(path.data, "/", &tokenizer);
 
+    if (p_route->parts_length == 0) {
+        return strcmp(p_path, "/") == 0;
+    }
+
     for (const struct route_part* part = p_route->parts; part < p_route->parts + p_route->parts_length; part++) {
         if (path_part == NULL) {
             return false;
