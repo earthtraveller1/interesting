@@ -2,6 +2,22 @@
 
 #include "templates.h"
 
+void append_template_parameter(struct template_parameters *p_parameters, const struct template_parameter *p_parameter) {
+    if (p_parameters->capacity == 0) {
+        p_parameters->length = 0;
+        p_parameters->capacity = 1;
+        p_parameters->parameters = malloc(sizeof(struct template_parameter));
+    }
+
+    if (p_parameters->capacity == p_parameters->length) {
+        p_parameters->capacity *= 2;
+        p_parameters->parameters = realloc(p_parameters->parameters, p_parameters->capacity * sizeof(struct template_parameter));
+    }
+
+    p_parameters->parameters[p_parameters->length] = *p_parameter;
+    p_parameters->length += 1;
+}
+
 void free_template_node(const struct template_node* p_node) {
     // We don't needd to free var separately, 
     // as they are in a union, so this should free both of them.
