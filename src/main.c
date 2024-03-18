@@ -49,8 +49,6 @@ static struct http_response index_handler(const struct parameters* parameters, c
 
     const struct string_error page = read_string_from_file("pages/index.html");
 
-    free_parameters(parameters);
-
     return (struct http_response) {
         .status = "200 OK",
         .content_type = "text/html",
@@ -65,8 +63,6 @@ static struct http_response neng_handler(const struct parameters* parameters, co
     (void)user_data;
 
     const struct string_error page = read_string_from_file("pages/neng.html");
-
-    free_parameters(parameters);
 
     return (struct http_response) {
         .status = "200 OK",
