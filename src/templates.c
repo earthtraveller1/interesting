@@ -205,8 +205,9 @@ struct template parse_template(const char* source) {
             append_template_node_to_template(&template, &text_node);
             text_node = (struct template_node) {0};
 
-            struct template_node node = parse_node(NULL, &source, source, source_end);
-            append_template_node_to_template(&template, &node);
+            struct template_expression expression = parse_expression(&source, source_end);
+            struct template_node expression_node = parse_node(&expression, &source, source, source_end);
+            append_template_node_to_template(&template, &expression_node);
         }
 
         string_append_char(&text_node.text, *source);
