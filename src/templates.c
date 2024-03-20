@@ -93,16 +93,13 @@ struct template_node parse_node(char** p_source, const char* p_source_start, con
 
     char window[4] = {0};
 
-    enum {
-        EXPRESSION_NONE,
-        EXPRESSION_IF,
-        EXPRESSION_FOR,
-        EXPRESSION_VAR,
-    } expression_type;
+    const struct template_expression expression = parse_expression(p_source, p_source_end);
 
-    struct string variable_name = {0};
-    bool recording_variable_name = false;
-
+    if (expression.type == TEMPLATE_EXPRESSION_VAR) {
+        node.type = TEMPLATE_VAR;
+        node.var = expression.variable_name;
+        return node;
+    } 
 
     return node;
 }
