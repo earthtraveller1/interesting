@@ -164,7 +164,6 @@ struct template parse_template(const char* source) {
     struct template template = {0};
     /* Remember, this points to a null character */
     const char* const source_end = source + strlen(source);
-    const char* const source_start = source;
 
     char window[4] = {0};
 
