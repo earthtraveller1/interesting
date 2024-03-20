@@ -183,6 +183,10 @@ struct template parse_template(const char* source) {
 
     char window[4] = {0};
 
+    struct template_node text_node = {
+        .type = TEMPLATE_TEXT
+    };
+
     while (source < source_end) {
         const char* character = source;
         window[0] = *character;
@@ -198,10 +202,14 @@ struct template parse_template(const char* source) {
         }
 
         if (strcmp(window, "%{{") == 0) {
+            append_template_node_to_template(&template, &text_node);
+            text_node = (struct template_node) {0};
+
             struct template_node node = parse_node(NULL, &source, source, source_end);
             append_template_node_to_template(&template, &node);
         }
 
+        string_append_char(&text_node.text, *source);
         source += 1;
     }
 
