@@ -3,6 +3,17 @@
 
 #include "templates.h"
 
+struct template_expression {
+    enum {
+        TEMPLATE_EXPRESSION_NONE,
+        TEMPLATE_EXPRESSION_IF,
+        TEMPLATE_EXPRESSION_FOR,
+        TEMPLATE_EXPRESSION_VAR,
+    } type;
+
+    struct string variable_name;
+};
+
 static void append_template_node(struct template *p_template, const struct template_node *p_node) {
     if (p_template->children_capacity == 0) {
         p_template->children_length = 0;
@@ -19,21 +30,10 @@ static void append_template_node(struct template *p_template, const struct templ
     p_template->children_length += 1;
 }
 
-struct template_node parse_node(char** p_source, const char* p_source_start, const char* p_source_end) {
-    struct template_node node = {0};
-
-    p_source += 1;
+static struct template_expression parse_expression(char** p_source, const char* p_source_end) {
+    struct template_expression expression = {0};
 
     char window[4] = {0};
-
-    enum {
-        EXPRESSION_NONE,
-        EXPRESSION_IF,
-        EXPRESSION_FOR,
-        EXPRESSION_VAR,
-    } expression_type;
-
-    struct string variable_name = {0};
     bool recording_variable_name = false;
 
     while (*p_source < p_source_end) {
@@ -55,15 +55,15 @@ struct template_node parse_node(char** p_source, const char* p_source_start, con
             break;
         }
 
-        if (expression_type == EXPRESSION_NONE) {
+        if (expression.type == TEMPLATE_EXPRESSION_NONE) {
             if (strncmp(window, "if ", 3) == 0) {
-                expression_type = EXPRESSION_IF;
+                expression.type = TEMPLATE_EXPRESSION_IF;
             }
             if (strncmp(window, "for ", 4) == 0) {
-                expression_type = EXPRESSION_FOR;
+                expression.type = TEMPLATE_EXPRESSION_FOR;
             }
             if (window[0] == '$') {
-                expression_type = EXPRESSION_VAR;
+                expression.type = TEMPLATE_EXPRESSION_VAR;
                 recording_variable_name = true;
             }
         } else {
@@ -71,7 +71,7 @@ struct template_node parse_node(char** p_source, const char* p_source_start, con
                 if (**p_source == ' ') {
                     recording_variable_name = false;
                 } else {
-                    string_append_char(&variable_name, **p_source);
+                    string_append_char(&expression.variable_name, **p_source);
                 }
             } else {
                 if (**p_source == '{') {
@@ -82,6 +82,27 @@ struct template_node parse_node(char** p_source, const char* p_source_start, con
 
         *p_source += 1;
     }
+
+    return expression;
+}
+
+struct template_node parse_node(char** p_source, const char* p_source_start, const char* p_source_end) {
+    struct template_node node = {0};
+
+    p_source += 1;
+
+    char window[4] = {0};
+
+    enum {
+        EXPRESSION_NONE,
+        EXPRESSION_IF,
+        EXPRESSION_FOR,
+        EXPRESSION_VAR,
+    } expression_type;
+
+    struct string variable_name = {0};
+    bool recording_variable_name = false;
+
 
     return node;
 }
