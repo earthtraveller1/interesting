@@ -14,7 +14,7 @@ struct template_expression {
     struct string variable_name;
 };
 
-static void append_template_node(struct template *p_template, const struct template_node *p_node) {
+static void append_template_node(struct template_node *p_template, const struct template_node *p_node) {
     if (p_template->children_capacity == 0) {
         p_template->children_length = 0;
         p_template->children_capacity = 1;
@@ -86,20 +86,66 @@ static struct template_expression parse_expression(char** p_source, const char* 
     return expression;
 }
 
-struct template_node parse_node(char** p_source, const char* p_source_start, const char* p_source_end) {
+struct template_node parse_node(const struct template_expression* p_first_expression, char** p_source, const char* p_source_start, const char* p_source_end) {
     struct template_node node = {0};
 
     p_source += 1;
-
     char window[4] = {0};
 
-    const struct template_expression expression = parse_expression(p_source, p_source_end);
+    if (p_first_expression->type == TEMPLATE_EXPRESSION_NONE) {
+        return node;
+    }
 
-    if (expression.type == TEMPLATE_EXPRESSION_VAR) {
+    if (p_first_expression->type == TEMPLATE_EXPRESSION_VAR) {
         node.type = TEMPLATE_VAR;
-        node.var = expression.variable_name;
+        node.var = p_first_expression->variable_name;
         return node;
     } 
+
+    switch (p_first_expression->type) {
+        case TEMPLATE_EXPRESSION_IF:
+            node.type = TEMPLATE_IF;
+            break;
+        case TEMPLATE_EXPRESSION_FOR:
+            node.type = TEMPLATE_FOR;
+            break;
+        default:
+            break;
+    }
+
+    node.var = p_first_expression->variable_name;
+
+    struct template_node body_text_node = {
+        .type = TEMPLATE_TEXT
+    };
+
+    while (*p_source < p_source_end) {
+        const char* character = *p_source;
+
+        window[0] = *character;
+        character += 1;
+        if (character < p_source_end) {
+            window[1] = *character;
+        }
+
+        character += 1;
+        if (character < p_source_end) {
+            window[2] = *character;
+        }
+
+        *p_source += 1;
+
+        if (strcmp(window, "%{{") == 0) {
+            append_template_node(&node, &body_text_node);
+            body_text_node = (struct template_node) {0};
+
+            struct template_expression expression = parse_expression(p_source, p_source_end);
+            struct template_node expression_node = parse_node(&expression, p_source, p_source_start, p_source_end);
+            append_template_node(&node, &expression_node);
+        }
+
+        string_append_char(&body_text_node.text, **p_source);
+    }
 
     return node;
 }
