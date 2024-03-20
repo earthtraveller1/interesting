@@ -31,6 +31,22 @@ static void append_template_node(struct template_node *p_template, const struct 
     p_template->children_length += 1;
 }
 
+static void append_template_node_to_template(struct template *p_template, const struct template_node *p_node) {
+    if (p_template->children_capacity == 0) {
+        p_template->children_length = 0;
+        p_template->children_capacity = 1;
+        p_template->children = malloc(sizeof(struct template_node));
+    }
+
+    if (p_template->children_capacity == p_template->children_length) {
+        p_template->children_capacity *= 2;
+        p_template->children = realloc(p_template->children, p_template->children_capacity * sizeof(struct template_node));
+    }
+
+    p_template->children[p_template->children_length] = *p_node;
+    p_template->children_length += 1;
+}
+
 static struct template_expression parse_expression(char** p_source, const char* p_source_end) {
     struct template_expression expression = {0};
 
@@ -182,7 +198,8 @@ struct template parse_template(const char* source) {
         }
 
         if (strcmp(window, "%{{") == 0) {
-            
+            struct template_node node = parse_node(NULL, &source, source, source_end);
+            append_template_node_to_template(&template, &node);
         }
     }
 
