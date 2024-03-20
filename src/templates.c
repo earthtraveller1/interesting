@@ -201,6 +201,8 @@ struct template parse_template(const char* source) {
             struct template_node node = parse_node(NULL, &source, source, source_end);
             append_template_node_to_template(&template, &node);
         }
+
+        source += 1;
     }
 
     return template;
