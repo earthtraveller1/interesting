@@ -47,7 +47,7 @@ static void append_template_node_to_template(struct template *p_template, const 
     p_template->children_length += 1;
 }
 
-static struct template_expression parse_expression(char** p_source, const char* p_source_end) {
+static struct template_expression parse_expression(const char** p_source, const char* p_source_end) {
     struct template_expression expression = {0};
 
     char window[4] = {0};
@@ -106,7 +106,7 @@ static struct template_expression parse_expression(char** p_source, const char* 
     return expression;
 }
 
-struct template_node parse_node(const struct template_expression* p_first_expression, char** p_source, const char* p_source_start, const char* p_source_end) {
+struct template_node parse_node(const struct template_expression* p_first_expression, const char** p_source, const char* p_source_start, const char* p_source_end) {
     struct template_node node = {0};
 
     p_source += 1;
