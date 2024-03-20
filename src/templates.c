@@ -9,6 +9,7 @@ struct template_expression {
         TEMPLATE_EXPRESSION_IF,
         TEMPLATE_EXPRESSION_FOR,
         TEMPLATE_EXPRESSION_VAR,
+        TEMPLATE_EXPRESSION_END,
     } type;
 
     struct string variable_name;
@@ -61,6 +62,9 @@ static struct template_expression parse_expression(char** p_source, const char* 
             }
             if (strncmp(window, "for ", 4) == 0) {
                 expression.type = TEMPLATE_EXPRESSION_FOR;
+            }
+            if (strncmp(window, "end ", 4) == 0) {
+                expression.type = TEMPLATE_EXPRESSION_END;
             }
             if (window[0] == '$') {
                 expression.type = TEMPLATE_EXPRESSION_VAR;
@@ -140,8 +144,14 @@ struct template_node parse_node(const struct template_expression* p_first_expres
             body_text_node = (struct template_node) {0};
 
             struct template_expression expression = parse_expression(p_source, p_source_end);
+            if (expression.type == TEMPLATE_EXPRESSION_END) {
+                break;
+            }
+
             struct template_node expression_node = parse_node(&expression, p_source, p_source_start, p_source_end);
             append_template_node(&node, &expression_node);
+
+            continue;
         }
 
         string_append_char(&body_text_node.text, **p_source);
