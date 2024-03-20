@@ -1,6 +1,120 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "templates.h"
+
+static void append_template_node(struct template *p_template, const struct template_node *p_node) {
+    if (p_template->children_capacity == 0) {
+        p_template->children_length = 0;
+        p_template->children_capacity = 1;
+        p_template->children = malloc(sizeof(struct template_node));
+    }
+
+    if (p_template->children_capacity == p_template->children_length) {
+        p_template->children_capacity *= 2;
+        p_template->children = realloc(p_template->children, p_template->children_capacity * sizeof(struct template_node));
+    }
+
+    p_template->children[p_template->children_length] = *p_node;
+    p_template->children_length += 1;
+}
+
+struct template_node parse_node(char** p_source, const char* p_source_start, const char* p_source_end) {
+    struct template_node node = {0};
+
+    p_source += 1;
+
+    char window[4] = {0};
+
+    enum {
+        EXPRESSION_NONE,
+        EXPRESSION_IF,
+        EXPRESSION_FOR,
+        EXPRESSION_VAR,
+    } expression_type;
+
+    struct string variable_name = {0};
+    bool recording_variable_name = false;
+
+    while (*p_source < p_source_end) {
+        const char* character = *p_source;
+        window[0] = *character;
+
+        character += 1;
+        if (character < p_source_end) {
+            window[1] = *character;
+        }
+
+        character += 1;
+        if (character < p_source_end) {
+            window[2] = *character;
+        }
+
+        if (strcmp(window, "}}%") == 0) {
+            *p_source += 3;
+            break;
+        }
+
+        if (expression_type == EXPRESSION_NONE) {
+            if (strncmp(window, "if ", 3) == 0) {
+                expression_type = EXPRESSION_IF;
+            }
+            if (strncmp(window, "for ", 4) == 0) {
+                expression_type = EXPRESSION_FOR;
+            }
+            if (window[0] == '$') {
+                expression_type = EXPRESSION_VAR;
+                recording_variable_name = true;
+            }
+        } else {
+            if (recording_variable_name) {
+                if (**p_source == ' ') {
+                    recording_variable_name = false;
+                } else {
+                    string_append_char(&variable_name, **p_source);
+                }
+            } else {
+                if (**p_source == '{') {
+                    recording_variable_name = true;
+                }
+            }
+        }
+
+        *p_source += 1;
+    }
+
+    return node;
+}
+
+struct template parse_template(const char* source) {
+    struct template template = {0};
+    /* Remember, this points to a null character */
+    const char* const source_end = source + strlen(source);
+    const char* const source_start = source;
+
+    char window[4] = {0};
+
+    while (source < source_end) {
+        const char* character = source;
+        window[0] = *character;
+
+        character += 1;
+        if (character < source_end) {
+            window[1] = *character;
+        }
+
+        character += 1;
+        if (character < source_end) {
+            window[2] = *character;
+        }
+
+        if (strcmp(window, "%{{") == 0) {
+            
+        }
+    }
+
+    return template;
+}
 
 void append_template_parameter(struct template_parameters *p_parameters, const struct template_parameter *p_parameter) {
     if (p_parameters->capacity == 0) {
