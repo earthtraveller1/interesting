@@ -58,7 +58,7 @@ static bool route_matching_test(void) {
 }
 
 static bool template_parsing_test(void) {
-    const char* template_str = "Hello, {name}!";
+    const char* template_str = "Hello, %{{ $name }}!";
     const struct template template = parse_template(template_str);
 
     test_assert(template.children_length == 2);
