@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -198,9 +199,8 @@ struct template_node parse_node(const struct template_expression* p_first_expres
             append_template_node(&node, &expression_node);
         } else {
             string_append_char(&body_text_node.text, **p_source);
+            *p_source += 1;
         }
-
-        *p_source += 1;
     }
 
     if (body_text_node.text.data != NULL) {
@@ -247,10 +247,13 @@ struct template parse_template(const char* source) {
             append_template_node_to_template(&template, &expression_node);
         } else {
             string_append_char(&text_node.text, *source);
+            source += 1;
         }
+    }
 
-        source += 1;
-
+    if (text_node.text.data != NULL) {
+        append_template_node_to_template(&template, &text_node);
+        text_node = (struct template_node) {0};
     }
 
     return template;
