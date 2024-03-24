@@ -84,6 +84,12 @@ static struct template_expression parse_expression(const char** p_source, const 
             break;
         }
 
+        if (strncmp(window, "in ", 3) == 0) {
+            if (recorded_variable_name) {
+                preparing_recording_second_variable_name = true;
+            }
+        }
+
         if (expression.type == TEMPLATE_EXPRESSION_NONE) {
             if (strncmp(window, "if ", 3) == 0) {
                 expression.type = TEMPLATE_EXPRESSION_IF;
@@ -93,11 +99,6 @@ static struct template_expression parse_expression(const char** p_source, const 
             }
             if (strncmp(window, "end ", 4) == 0) {
                 expression.type = TEMPLATE_EXPRESSION_END;
-            }
-            if (strncmp(window, "in ", 3) == 0) {
-                if (recorded_variable_name) {
-                    preparing_recording_second_variable_name = true;
-                }
             }
             if (window[0] == '$') {
                 expression.type = TEMPLATE_EXPRESSION_VAR;
@@ -161,6 +162,7 @@ struct template_node parse_node(const struct template_expression* p_first_expres
     }
 
     node.var = p_first_expression->variable_name;
+    node.second_var = p_first_expression->second_variable_name;
 
     struct template_node body_text_node = {
         .type = TEMPLATE_TEXT
