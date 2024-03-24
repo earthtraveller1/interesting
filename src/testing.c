@@ -71,7 +71,11 @@ static bool template_parsing_test(void) {
 }
 
 static bool template_parsing_test_for_if(void) {
-    const char* template_str = "%{{ if $neng_is_alive }}% Neng is alive! %{{ end }}%";
+    const char* template_str = 
+        "%{{ if $neng_is_alive }}%\n" 
+        "    Neng is alive!\n"
+        "%{{ end }}%";
+
     const struct template template = parse_template(template_str);
 
     test_assert(template.children_length == 1);
@@ -79,13 +83,17 @@ static bool template_parsing_test_for_if(void) {
     test_assert(strcmp(template.children[0].var.data, "neng_is_alive") == 0);
     test_assert(template.children[0].children_length == 1);
     test_assert(template.children[0].children[0].type == TEMPLATE_TEXT);
-    test_assert(strcmp(template.children[0].children[0].text.data, " Neng is alive! ") == 0);
+    test_assert(strcmp(template.children[0].children[0].text.data, "\n    Neng is alive!\n") == 0);
 
     return true;
 }
 
 static bool template_parsing_test_for_for(void) {
-    const char* template_str = "%{{ for $name in $names }}% Hello, %{{ $name }}% %{{ end }}%";
+    const char* template_str = 
+        "%{{ for $name in $names }}%\n"
+        "    Hello, %{{ $name }}%\n"
+        "%{{ end }}%";
+
     const struct template template = parse_template(template_str);
 
     test_assert(template.children_length == 1);
@@ -95,7 +103,7 @@ static bool template_parsing_test_for_for(void) {
 
     test_assert(template.children[0].children_length == 2);
     test_assert(template.children[0].children[0].type == TEMPLATE_TEXT);
-    test_assert(strcmp(template.children[0].children[0].text.data, " Hello, ") == 0);
+    test_assert(strcmp(template.children[0].children[0].text.data, "\n    Hello, ") == 0);
     test_assert(template.children[0].children[1].type == TEMPLATE_VAR);
     test_assert(strcmp(template.children[0].children[1].var.data, "name") == 0);
 
