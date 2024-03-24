@@ -182,8 +182,10 @@ struct template_node parse_node(const struct template_expression* p_first_expres
         }
 
         if (strcmp(window, "%{{") == 0) {
-            append_template_node(&node, &body_text_node);
-            body_text_node = (struct template_node) {0};
+            if (body_text_node.text.data != NULL) {
+                append_template_node(&node, &body_text_node);
+                body_text_node = (struct template_node) {0};
+            }
 
             struct template_expression expression = parse_expression(p_source, p_source_end);
             if (expression.type == TEMPLATE_EXPRESSION_END) {
@@ -199,7 +201,10 @@ struct template_node parse_node(const struct template_expression* p_first_expres
         *p_source += 1;
     }
 
-    append_template_node(&node, &body_text_node);
+    if (body_text_node.text.data != NULL) {
+        append_template_node(&node, &body_text_node);
+        body_text_node = (struct template_node) {0};
+    }
 
     return node;
 }
@@ -230,8 +235,10 @@ struct template parse_template(const char* source) {
         }
 
         if (strcmp(window, "%{{") == 0) {
-            append_template_node_to_template(&template, &text_node);
-            text_node = (struct template_node) {0};
+            if (text_node.text.data != NULL) {
+                append_template_node_to_template(&template, &text_node);
+                text_node = (struct template_node) {0};
+            }
 
             struct template_expression expression = parse_expression(&source, source_end);
             struct template_node expression_node = parse_node(&expression, &source, source_end);
