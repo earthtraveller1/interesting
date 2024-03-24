@@ -61,11 +61,13 @@ static bool template_parsing_test(void) {
     const char* template_str = "Hello, %{{ $name }}%!";
     const struct template template = parse_template(template_str);
 
-    test_assert(template.children_length == 2);
+    test_assert(template.children_length == 3);
     test_assert(template.children[0].type == TEMPLATE_TEXT);
     test_assert(strcmp(template.children[0].text.data, "Hello, ") == 0);
     test_assert(template.children[1].type == TEMPLATE_VAR);
     test_assert(strcmp(template.children[1].var.data, "name") == 0);
+    test_assert(template.children[2].type == TEMPLATE_TEXT);
+    test_assert(strcmp(template.children[2].text.data, "!") == 0);
 
     return true;
 }
