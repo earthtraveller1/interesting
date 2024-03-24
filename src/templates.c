@@ -13,6 +13,8 @@ struct template_expression {
     } type;
 
     struct string variable_name;
+    /* Used only in the case of FOR expressions */
+    struct string second_variable_name;
 };
 
 static void append_template_node(struct template_node *p_template, const struct template_node *p_node) {
@@ -52,6 +54,9 @@ static struct template_expression parse_expression(const char** p_source, const 
 
     char window[4] = {0};
     bool recording_variable_name = false;
+    bool recorded_variable_name = false;
+    bool preparing_recording_second_variable_name = false;
+    bool recording_second_variable_name = false;
 
     while (*p_source < p_source_end) {
         const char* character = *p_source;
@@ -82,16 +87,33 @@ static struct template_expression parse_expression(const char** p_source, const 
             if (strncmp(window, "end ", 4) == 0) {
                 expression.type = TEMPLATE_EXPRESSION_END;
             }
+            if (strncmp(window, "in ", 3) == 0) {
+                if (recorded_variable_name) {
+                    preparing_recording_second_variable_name = true;
+                }
+            }
             if (window[0] == '$') {
-                expression.type = TEMPLATE_EXPRESSION_VAR;
-                recording_variable_name = true;
+                if (preparing_recording_second_variable_name) {
+                    recording_second_variable_name = true;
+                    preparing_recording_second_variable_name = false;
+                } else {
+                    expression.type = TEMPLATE_EXPRESSION_VAR;
+                    recording_variable_name = true;
+                }
             }
         } else {
             if (recording_variable_name) {
                 if (**p_source == ' ') {
                     recording_variable_name = false;
+                    recorded_variable_name = true;
                 } else {
                     string_append_char(&expression.variable_name, **p_source);
+                }
+            } else if (recording_second_variable_name) {
+                if (**p_source == ' ') {
+                    recording_second_variable_name = false;
+                } else {
+                    string_append_char(&expression.second_variable_name, **p_source);
                 }
             } else {
                 if (**p_source == '{') {

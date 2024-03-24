@@ -16,6 +16,9 @@ struct template_node {
         struct string var;
     };
 
+    // In the case of FOR expressions, the second var is the array to iterate over
+    struct string second_var;
+
     struct template_node *children;
     size_t children_length;
     size_t children_capacity;
