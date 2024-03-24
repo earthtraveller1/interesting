@@ -91,7 +91,7 @@ static bool template_parsing_test_for_if(void) {
 static bool template_parsing_test_for_for(void) {
     const char* template_str = 
         "%{{ for $name in $names }}%\n"
-        "    Hello, %{{ $name }}%\n"
+        "    Hello, %{{ $name }}%, you are pretty cringe, not gonna lie.\n"
         "%{{ end }}%";
 
     const struct template template = parse_template(template_str);
@@ -101,11 +101,13 @@ static bool template_parsing_test_for_for(void) {
     test_assert(strcmp(template.children[0].var.data, "name") == 0);
     test_assert(strcmp(template.children[0].second_var.data, "names") == 0);
 
-    test_assert(template.children[0].children_length == 2);
+    test_assert(template.children[0].children_length == 3);
     test_assert(template.children[0].children[0].type == TEMPLATE_TEXT);
     test_assert(strcmp(template.children[0].children[0].text.data, "\n    Hello, ") == 0);
     test_assert(template.children[0].children[1].type == TEMPLATE_VAR);
     test_assert(strcmp(template.children[0].children[1].var.data, "name") == 0);
+    test_assert(template.children[0].children[2].type == TEMPLATE_TEXT);
+    test_assert(strcmp(template.children[0].children[2].text.data, ", you are pretty cringe, not gonna lie.\n") == 0);
 
     return true;
 }
