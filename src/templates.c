@@ -59,6 +59,8 @@ static struct template_expression parse_expression(const char** p_source, const 
     bool recording_second_variable_name = false;
 
     while (*p_source < p_source_end) {
+        memset(window, 0, 4);
+
         const char* character = *p_source;
         window[0] = *character;
 
@@ -93,17 +95,12 @@ static struct template_expression parse_expression(const char** p_source, const 
                 }
             }
             if (window[0] == '$') {
-                if (preparing_recording_second_variable_name) {
-                    recording_second_variable_name = true;
-                    preparing_recording_second_variable_name = false;
-                } else {
-                    expression.type = TEMPLATE_EXPRESSION_VAR;
-                    recording_variable_name = true;
-                }
+                expression.type = TEMPLATE_EXPRESSION_VAR;
+                recording_variable_name = true;
             }
         } else {
             if (recording_variable_name) {
-                if (**p_source == ' ') {
+                if (**p_source == ' ' && !recorded_variable_name) {
                     recording_variable_name = false;
                     recorded_variable_name = true;
                 } else {
@@ -116,8 +113,13 @@ static struct template_expression parse_expression(const char** p_source, const 
                     string_append_char(&expression.second_variable_name, **p_source);
                 }
             } else {
-                if (**p_source == '{') {
-                    recording_variable_name = true;
+                if (**p_source == '$') {
+                    if (preparing_recording_second_variable_name) {
+                        recording_second_variable_name = true;
+                        preparing_recording_second_variable_name = false;
+                    } else {
+                        recording_variable_name = true;
+                    }
                 }
             }
         }
