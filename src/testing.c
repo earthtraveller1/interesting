@@ -84,12 +84,31 @@ static bool template_parsing_test_for_if(void) {
     return true;
 }
 
+static bool template_parsing_test_for_for(void) {
+    const char* template_str = "%{{ for $name in $names }}% Hello, %{{ $name }}% %{{ end }}%";
+    const struct template template = parse_template(template_str);
+
+    test_assert(template.children_length == 1);
+    test_assert(template.children[0].type == TEMPLATE_FOR);
+    test_assert(strcmp(template.children[0].var.data, "name") == 0);
+    test_assert(strcmp(template.children[0].second_var.data, "names") == 0);
+
+    test_assert(template.children[0].children_length == 2);
+    test_assert(template.children[0].children[0].type == TEMPLATE_TEXT);
+    test_assert(strcmp(template.children[0].children[0].text.data, " Hello, ") == 0);
+    test_assert(template.children[0].children[1].type == TEMPLATE_VAR);
+    test_assert(strcmp(template.children[0].children[1].var.data, "name") == 0);
+
+    return true;
+}
+
 int run_tests(void) {
     run_test(http_parser_test);
     run_test(router_test);
     run_test(route_matching_test);
     run_test(template_parsing_test);
     run_test(template_parsing_test_for_if);
+    run_test(template_parsing_test_for_for);
 
     return 0;
 }
