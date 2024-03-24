@@ -52,14 +52,14 @@ static void append_template_node_to_template(struct template *p_template, const 
 static struct template_expression parse_expression(const char** p_source, const char* p_source_end) {
     struct template_expression expression = {0};
 
-    char window[4] = {0};
+    char window[5] = {0};
     bool recording_variable_name = false;
     bool recorded_variable_name = false;
     bool preparing_recording_second_variable_name = false;
     bool recording_second_variable_name = false;
 
     while (*p_source < p_source_end) {
-        memset(window, 0, 4);
+        memset(window, 0, 5);
 
         const char* character = *p_source;
         window[0] = *character;
@@ -74,7 +74,12 @@ static struct template_expression parse_expression(const char** p_source, const 
             window[2] = *character;
         }
 
-        if (strcmp(window, "}}%") == 0) {
+        character += 1;
+        if (character < p_source_end) {
+            window[3] = *character;
+        }
+
+        if (strncmp(window, "}}%", 3) == 0) {
             *p_source += 3;
             break;
         }
@@ -162,6 +167,7 @@ struct template_node parse_node(const struct template_expression* p_first_expres
     };
 
     while (*p_source < p_source_end) {
+        memset(window, 0, 4);
         const char* character = *p_source;
 
         window[0] = *character;
@@ -175,8 +181,6 @@ struct template_node parse_node(const struct template_expression* p_first_expres
             window[2] = *character;
         }
 
-        *p_source += 1;
-
         if (strcmp(window, "%{{") == 0) {
             append_template_node(&node, &body_text_node);
             body_text_node = (struct template_node) {0};
@@ -188,11 +192,11 @@ struct template_node parse_node(const struct template_expression* p_first_expres
 
             struct template_node expression_node = parse_node(&expression, p_source, p_source_end);
             append_template_node(&node, &expression_node);
-
-            continue;
+        } else {
+            string_append_char(&body_text_node.text, **p_source);
         }
 
-        string_append_char(&body_text_node.text, **p_source);
+        *p_source += 1;
     }
 
     append_template_node(&node, &body_text_node);
