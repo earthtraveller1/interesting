@@ -71,7 +71,7 @@ static bool template_parsing_test(void) {
 }
 
 static bool template_parsing_test_for_if(void) {
-    const char* template_str = "%{{ if $neng_is_alive }} Neng is alive! %{{ end }}";
+    const char* template_str = "%{{ if $neng_is_alive }}% Neng is alive! %{{ end }}%";
     const struct template template = parse_template(template_str);
 
     test_assert(template.children_length == 2);
