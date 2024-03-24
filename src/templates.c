@@ -130,10 +130,8 @@ static struct template_expression parse_expression(const char** p_source, const 
     return expression;
 }
 
-struct template_node parse_node(const struct template_expression* p_first_expression, const char** p_source, const char* p_source_start, const char* p_source_end) {
+struct template_node parse_node(const struct template_expression* p_first_expression, const char** p_source, const char* const p_source_end) {
     struct template_node node = {0};
-
-    p_source += 1;
     char window[4] = {0};
 
     if (p_first_expression->type == TEMPLATE_EXPRESSION_NONE) {
@@ -188,7 +186,7 @@ struct template_node parse_node(const struct template_expression* p_first_expres
                 break;
             }
 
-            struct template_node expression_node = parse_node(&expression, p_source, p_source_start, p_source_end);
+            struct template_node expression_node = parse_node(&expression, p_source, p_source_end);
             append_template_node(&node, &expression_node);
 
             continue;
@@ -196,6 +194,8 @@ struct template_node parse_node(const struct template_expression* p_first_expres
 
         string_append_char(&body_text_node.text, **p_source);
     }
+
+    append_template_node(&node, &body_text_node);
 
     return node;
 }
@@ -230,12 +230,14 @@ struct template parse_template(const char* source) {
             text_node = (struct template_node) {0};
 
             struct template_expression expression = parse_expression(&source, source_end);
-            struct template_node expression_node = parse_node(&expression, &source, source, source_end);
+            struct template_node expression_node = parse_node(&expression, &source, source_end);
             append_template_node_to_template(&template, &expression_node);
+        } else {
+            string_append_char(&text_node.text, *source);
         }
 
-        string_append_char(&text_node.text, *source);
         source += 1;
+
     }
 
     return template;
