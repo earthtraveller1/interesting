@@ -74,13 +74,15 @@ static bool template_parsing_test_for_if(void) {
     const char* template_str = "%{{ if $neng_is_alive }}% Neng is alive! %{{ end }}%";
     const struct template template = parse_template(template_str);
 
-    test_assert(template.children_length == 1);
-    test_assert(template.children[0].type == TEMPLATE_IF);
-    test_assert(strcmp(template.children[0].var.data, "neng_is_alive") == 0);
+    test_assert(template.children_length == 2);
+    test_assert(template.children[0].type == TEMPLATE_TEXT);
+    test_assert(template.children[0].text.data == NULL);
 
-    test_assert(template.children[0].children_length == 1);
-    test_assert(template.children[0].children[0].type == TEMPLATE_TEXT);
-    test_assert(strcmp(template.children[0].children[0].text.data, " Neng is alive! ") == 0);
+    test_assert(template.children[1].type == TEMPLATE_IF);
+    test_assert(strcmp(template.children[1].var.data, "neng_is_alive") == 0);
+    test_assert(template.children[1].children_length == 1);
+    test_assert(template.children[1].children[0].type == TEMPLATE_TEXT);
+    test_assert(strcmp(template.children[1].children[0].text.data, " Neng is alive! ") == 0);
 
     return true;
 }
