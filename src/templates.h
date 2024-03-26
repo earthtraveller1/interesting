@@ -32,6 +32,11 @@ struct template {
     size_t children_capacity;
 };
 
+struct template_error {
+    enum error error;
+    struct template template;
+};
+
 struct template_parameter {
     enum {
         TEMPLATE_PARAMETER_TEXT,
@@ -52,7 +57,7 @@ struct template_parameters {
 
 struct template parse_template(const char* source);
 
-struct template parse_template_from_file(const char* filename);
+struct template_error parse_template_from_file(const char* filename);
 
 void append_template_parameter(struct template_parameters *params, const struct template_parameter *param);
 

@@ -272,6 +272,22 @@ struct template parse_template(const char* source) {
     return template;
 }
 
+struct template_error parse_template_from_file(const char* p_filename) {
+    struct template_error result = {0};
+
+    struct string_error file_contents = read_string_from_file(p_filename);
+    if (file_contents.error != INTERESTING_ERROR_SUCCESS) {
+        result.error = file_contents.error;
+
+        // We don't have to free the string here, as it should be null
+        return result;
+    }
+
+    result.template = parse_template(file_contents.string.data);
+    free_string(&file_contents.string);
+    return result;
+}
+
 void append_template_parameter(struct template_parameters *p_parameters, const struct template_parameter *p_parameter) {
     if (p_parameters->capacity == 0) {
         p_parameters->length = 0;
