@@ -8,6 +8,7 @@ struct template_expression {
     enum {
         TEMPLATE_EXPRESSION_NONE,
         TEMPLATE_EXPRESSION_IF,
+        TEMPLATE_EXPRESSION_ELSE,
         TEMPLATE_EXPRESSION_FOR,
         TEMPLATE_EXPRESSION_VAR,
         TEMPLATE_EXPRESSION_END,
@@ -53,14 +54,14 @@ static void append_template_node_to_template(struct template *p_template, const 
 static struct template_expression parse_expression(const char** p_source, const char* p_source_end) {
     struct template_expression expression = {0};
 
-    char window[5] = {0};
+    char window[6] = {0};
     bool recording_variable_name = false;
     bool recorded_variable_name = false;
     bool preparing_recording_second_variable_name = false;
     bool recording_second_variable_name = false;
 
     while (*p_source < p_source_end) {
-        memset(window, 0, 5);
+        memset(window, 0, 6);
 
         const char* character = *p_source;
         window[0] = *character;
@@ -78,6 +79,11 @@ static struct template_expression parse_expression(const char** p_source, const 
         character += 1;
         if (character < p_source_end) {
             window[3] = *character;
+        }
+
+        character += 1;
+        if (character < p_source_end) {
+            window[4] = *character;
         }
 
         if (strncmp(window, "}}%", 3) == 0) {
@@ -100,6 +106,9 @@ static struct template_expression parse_expression(const char** p_source, const 
             }
             if (strncmp(window, "end ", 4) == 0) {
                 expression.type = TEMPLATE_EXPRESSION_END;
+            }
+            if (strncmp(window, "else ", 5) == 0) {
+                expression.type = TEMPLATE_EXPRESSION_ELSE;
             }
             if (window[0] == '$') {
                 expression.type = TEMPLATE_EXPRESSION_VAR;
@@ -150,6 +159,11 @@ struct template_node parse_node(const struct template_expression* p_first_expres
         node.var = p_first_expression->variable_name;
         return node;
     } 
+
+    if (p_first_expression->type == TEMPLATE_EXPRESSION_ELSE) {
+        node.type = TEMPLATE_ELSE;
+        return node;
+    }
 
     switch (p_first_expression->type) {
         case TEMPLATE_EXPRESSION_IF:

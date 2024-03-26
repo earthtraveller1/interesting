@@ -8,6 +8,7 @@ struct template_node {
         TEMPLATE_TEXT,
         TEMPLATE_VAR,
         TEMPLATE_IF,
+        TEMPLATE_ELSE,
         TEMPLATE_FOR,
     } type;
 
