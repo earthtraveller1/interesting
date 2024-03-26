@@ -114,6 +114,36 @@ static bool template_parsing_test_for_for(void) {
     return true;
 }
 
+static bool template_parsing_test_for_else(void) {
+    const char* template_str = 
+        "%{{ if $neng_is_alive }}%\n"
+        "    Neng is alive!\n"
+        "%{{ end }}%\n"
+        "%{{ else }}%\n"
+        "    Neng is dead!\n"
+        "%{{ end }}%";
+
+    const struct template template = parse_template(template_str);
+
+    test_assert(template.children_length == 3);
+
+    test_assert(template.children[0].type == TEMPLATE_IF);
+    test_assert(strcmp(template.children[0].var.data, "neng_is_alive") == 0);
+    test_assert(template.children[0].children_length == 1);
+    test_assert(template.children[0].children[0].type == TEMPLATE_TEXT);
+    test_assert(strcmp(template.children[0].children[0].text.data, "\n    Neng is alive!\n") == 0);
+
+    test_assert(template.children[1].type == TEMPLATE_TEXT);
+    test_assert(strcmp(template.children[1].text.data, "\n") == 0);
+
+    test_assert(template.children[2].type == TEMPLATE_ELSE);
+    test_assert(template.children[2].children_length == 1);
+    test_assert(template.children[2].children[0].type == TEMPLATE_TEXT);
+    test_assert(strcmp(template.children[2].children[0].text.data, "\n    Neng is dead!\n") == 0);
+    
+    return true;
+}
+
 int run_tests(void) {
     run_test(http_parser_test);
     run_test(router_test);
@@ -121,6 +151,7 @@ int run_tests(void) {
     run_test(template_parsing_test);
     run_test(template_parsing_test_for_if);
     run_test(template_parsing_test_for_for);
+    run_test(template_parsing_test_for_else);
 
     return 0;
 }
