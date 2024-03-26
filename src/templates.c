@@ -162,7 +162,6 @@ struct template_node parse_node(const struct template_expression* p_first_expres
 
     if (p_first_expression->type == TEMPLATE_EXPRESSION_ELSE) {
         node.type = TEMPLATE_ELSE;
-        return node;
     }
 
     switch (p_first_expression->type) {
