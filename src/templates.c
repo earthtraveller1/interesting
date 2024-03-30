@@ -346,6 +346,18 @@ enum error render_node(
             }
     }
 
+    for (
+        const struct template_node* node = p_node->children, *previous_node = NULL;
+        node < p_node->children + p_node->children_length;
+        node++, previous_node = node - 1
+    ) {
+        const enum error result = render_node(node, previous_node, params, p_target);
+
+        if (result != INTERESTING_ERROR_SUCCESS) {
+            return result;
+        }
+    }
+
     return INTERESTING_ERROR_SUCCESS;
 }
 
