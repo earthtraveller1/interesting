@@ -51,6 +51,21 @@ static void append_template_node_to_template(struct template *p_template, const 
     p_template->children_length += 1;
 }
 
+// May return NULL when the template parameter is not found.
+static const struct template_parameter* get_template_parameter(struct template_parameters* p_parameters, const char* p_name) {
+    for (
+        const struct template_parameter* parameter = p_parameters->parameters; 
+        parameter < p_parameters->parameters + p_parameters->length; 
+        parameter++
+    ) {
+        if (strcmp(parameter->name.data, p_name) == 0) {
+            return parameter;
+        }
+    }
+
+    return NULL;
+}
+
 static struct template_expression parse_expression(const char** p_source, const char* p_source_end) {
     struct template_expression expression = {0};
 
