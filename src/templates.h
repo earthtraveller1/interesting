@@ -43,6 +43,8 @@ struct template_parameter {
         TEMPLATE_PARAMETER_BOOLEAN,
     } type;
 
+    struct string name;
+
     union {
         struct string text;
         bool boolean;
