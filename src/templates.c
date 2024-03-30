@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "common.h"
 #include "templates.h"
 
 struct template_expression {
@@ -317,6 +318,43 @@ void append_template_parameter(struct template_parameters *p_parameters, const s
 
     p_parameters->parameters[p_parameters->length] = *p_parameter;
     p_parameters->length += 1;
+}
+
+enum error render_node(
+    const struct template_node* p_node, 
+    const struct template_node* p_previous_node,
+    const struct template_parameters* params, 
+    struct string* p_target
+) {
+    switch (p_node->type) {
+        case TEMPLATE_TEXT:
+            string_concat(p_target, &p_node->text);
+            break;
+        case TEMPLATE_VAR:
+            {
+                const struct template_parameter* variable = get_template_parameter(params, p_node->var.data);
+                if (variable == NULL) {
+                    return ERROR_REQUIRED_PARAMETER_NOT_PROVIDED;
+                }
+
+                if (variable->type != TEMPLATE_PARAMETER_TEXT) {
+                    return ERROR_PARAMETER_WRONG_TYPE;
+                }
+
+                string_concat(p_target, &variable->text);
+                break;
+            }
+    }
+
+    return INTERESTING_ERROR_SUCCESS;
+}
+
+struct string render_template(const struct template* template, const struct template_parameter* params) {
+    struct string rendered_result = {0};
+
+
+
+    return rendered_result;
 }
 
 void free_template_node(const struct template_node* p_node) {
