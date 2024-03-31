@@ -443,10 +443,16 @@ enum error render_node(
     return INTERESTING_ERROR_SUCCESS;
 }
 
-struct string render_template(const struct template* template, const struct template_parameter* params) {
+struct string render_template(const struct template* template, const struct template_parameters* params) {
     struct string rendered_result = {0};
 
-
+    for (
+        const struct template_node* node = template->children, *previous_node = NULL;
+        node < template->children + template->children_length;
+        node++, previous_node = node - 1
+    ) {
+        render_node(node, previous_node, params, &rendered_result);
+    }
 
     return rendered_result;
 }

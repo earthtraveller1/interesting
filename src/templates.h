@@ -65,7 +65,7 @@ struct template_error parse_template_from_file(const char* filename);
 
 void append_template_parameter(struct template_parameters *params, const struct template_parameter *param);
 
-struct string render_template(const struct template* template, const struct template_parameter* params);
+struct string render_template(const struct template* template, const struct template_parameters* params);
 
 void free_template_node(const struct template_node *node);
 
