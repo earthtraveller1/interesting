@@ -144,6 +144,27 @@ static bool template_parsing_test_for_else(void) {
     return true;
 }
 
+static bool template_rendering_test(void) {
+    const char* template_str = 
+        "Hello, %{{ $name }}%, you are pretty cringe, not gonna lie.";
+
+    const struct template template = parse_template(template_str);
+
+    struct template_parameters parameters = {0};
+    append_template_parameter(&parameters, &(struct template_parameter) {
+        .name = new_string("name"),
+        .type = TEMPLATE_PARAMETER_TEXT,
+        .text = new_string("Neng Li"),
+    });
+
+    const struct string result = render_template(&template, &parameters);
+    test_assert(strcmp(result.data, "Hello, Neng Li, you are pretty cringe, not gonna lie.") == 0);
+
+    free_string(&result);
+
+    return true;
+}
+
 int run_tests(void) {
     run_test(http_parser_test);
     run_test(router_test);
@@ -152,6 +173,7 @@ int run_tests(void) {
     run_test(template_parsing_test_for_if);
     run_test(template_parsing_test_for_for);
     run_test(template_parsing_test_for_else);
+    run_test(template_rendering_test);
 
     return 0;
 }
