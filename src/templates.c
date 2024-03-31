@@ -374,6 +374,25 @@ enum error render_node(
                     render_children(params);
                 }
             }
+        case TEMPLATE_ELSE:
+            {
+                if (p_previous_node->type != TEMPLATE_IF) {
+                    return ERROR_ELSE_MUST_FOLLOW_IF;
+                }
+
+                const struct template_parameter* if_variable = get_template_parameter(params, p_previous_node->var.data);
+                if (if_variable == NULL) {
+                    return ERROR_REQUIRED_PARAMETER_NOT_PROVIDED;
+                }
+
+                if (if_variable->type != TEMPLATE_PARAMETER_BOOLEAN) {
+                    return ERROR_PARAMETER_WRONG_TYPE;
+                }
+
+                if (!if_variable->boolean) {
+                    render_children(params);
+                }
+            }
         case TEMPLATE_FOR:
             {
                 const struct template_parameter* list_variable = get_template_parameter(params, p_node->second_var.data);
