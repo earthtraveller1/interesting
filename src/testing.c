@@ -146,7 +146,7 @@ static bool template_parsing_test_for_else(void) {
 
 static bool template_rendering_test(void) {
     const char* template_str = 
-        "Hello, %{{ $name }}%, you are pretty cringe, not gonna lie.";
+        "Hello, %{{ $name }}%, you are pretty %{{ $adjective }}%, not gonna lie.";
 
     const struct template template = parse_template(template_str);
 
@@ -155,6 +155,11 @@ static bool template_rendering_test(void) {
         .name = new_string("name"),
         .type = TEMPLATE_PARAMETER_TEXT,
         .text = new_string("Neng Li"),
+    });
+    append_template_parameter(&parameters, &(struct template_parameter) {
+        .name = new_string("adjective"),
+        .type = TEMPLATE_PARAMETER_TEXT,
+        .text = new_string("cringe"),
     });
 
     const struct string result = render_template(&template, &parameters);
