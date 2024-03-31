@@ -31,6 +31,12 @@ struct string_error {
     struct string string;
 };
 
+struct string_list {
+    struct string* strings;
+    size_t length;
+    size_t capacity;
+};
+
 struct string new_string(const char* literal);
 
 struct string_error read_string_from_file(const char* filename);
@@ -43,6 +49,10 @@ void string_concat(struct string* string, const struct string* other);
 
 bool string_ends_with(struct string* string, const char* suffix);
 
+void string_list_append(struct string_list* list, const struct string string);
+
 void free_string(const struct string* string);
+
+void free_string_list(const struct string_list* list);
 
 #endif

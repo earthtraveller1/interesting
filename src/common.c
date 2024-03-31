@@ -92,6 +92,30 @@ bool string_ends_with(struct string* p_string, const char* p_suffix) {
     return strcmp(p_string->data + p_string->length - suffix_length - 1, p_suffix) == 0;
 }
 
+void string_list_append(struct string_list* string_list, const struct string string) {
+    if (string_list->capacity == 0) {
+        string_list->length = 0;
+        string_list->capacity = 1;
+        string_list->strings = malloc(sizeof string_list->strings[0]);
+    }
+
+    if (string_list->capacity == string_list->length) {
+        string_list->capacity *= 2;
+        string_list->strings = realloc(string_list->strings, string_list->capacity * sizeof string_list->strings[0]);
+    }
+
+    string_list->strings[string_list->length] = string;
+    string_list->length += 1;
+}
+
 void free_string(const struct string* p_string) {
     free(p_string->data);
+}
+
+void free_string_list(const struct string_list* p_string_list) {
+    for (const struct string* string = p_string_list->strings; string < p_string_list->strings + p_string_list->length; string++) {
+        free_string(string);
+    }
+
+    free(p_string_list->strings);
 }
