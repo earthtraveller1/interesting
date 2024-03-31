@@ -53,7 +53,7 @@ static void append_template_node_to_template(struct template *p_template, const 
 }
 
 // May return NULL when the template parameter is not found.
-static const struct template_parameter* get_template_parameter(struct template_parameters* p_parameters, const char* p_name) {
+static const struct template_parameter* get_template_parameter(const struct template_parameters* p_parameters, const char* p_name) {
     for (
         const struct template_parameter* parameter = p_parameters->parameters; 
         parameter < p_parameters->parameters + p_parameters->length; 
