@@ -373,6 +373,8 @@ enum error render_node(
                 if (variable->boolean) {
                     render_children(params);
                 }
+
+                break;
             }
         case TEMPLATE_ELSE:
             {
@@ -392,6 +394,8 @@ enum error render_node(
                 if (!if_variable->boolean) {
                     render_children(params);
                 }
+
+                break;
             }
         case TEMPLATE_FOR:
             {
@@ -435,6 +439,8 @@ enum error render_node(
                 /* We do this to avoid freeing the individual parameters, as we don't own them here! */
                 new_parameters.length = 0;
                 free_template_parameters(&new_parameters);
+
+                break;
             }
     }
 
