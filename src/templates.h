@@ -40,6 +40,7 @@ struct template_error {
 struct template_parameter {
     enum {
         TEMPLATE_PARAMETER_TEXT,
+        TEMPLATE_PARAMETER_LIST,
         TEMPLATE_PARAMETER_BOOLEAN,
     } type;
 
@@ -47,6 +48,7 @@ struct template_parameter {
 
     union {
         struct string text;
+        struct string_list list;
         bool boolean;
     };
 };
