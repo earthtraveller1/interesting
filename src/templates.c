@@ -326,6 +326,21 @@ enum error render_node(
     const struct template_parameters* params, 
     struct string* p_target
 ) {
+    #define render_children(params) \
+        do { \
+            for ( \
+                const struct template_node* node = p_node->children, *previous_node = NULL; \
+                node < p_node->children + p_node->children_length; \
+                node++, previous_node = node - 1 \
+            ) { \
+                const enum error result = render_node(node, previous_node, params, p_target); \
+ \
+                if (result != INTERESTING_ERROR_SUCCESS) { \
+                    return result; \
+                } \
+            } \
+        } while (0)
+
     switch (p_node->type) {
         case TEMPLATE_TEXT:
             string_concat(p_target, &p_node->text);
@@ -344,19 +359,67 @@ enum error render_node(
                 string_concat(p_target, &variable->text);
                 break;
             }
+        case TEMPLATE_IF:
+            {
+                const struct template_parameter* variable = get_template_parameter(params, p_node->var.data);
+                if (variable == NULL) {
+                    return ERROR_REQUIRED_PARAMETER_NOT_PROVIDED;
+                }
+
+                if (variable->type != TEMPLATE_PARAMETER_BOOLEAN) {
+                    return ERROR_PARAMETER_WRONG_TYPE;
+                }
+
+                if (variable->boolean) {
+                    render_children(params);
+                }
+            }
+        case TEMPLATE_FOR:
+            {
+                const struct template_parameter* list_variable = get_template_parameter(params, p_node->second_var.data);
+                if (list_variable == NULL) {
+                    return ERROR_REQUIRED_PARAMETER_NOT_PROVIDED;
+                }
+
+                if (list_variable->type != TEMPLATE_PARAMETER_LIST) {
+                    return ERROR_PARAMETER_WRONG_TYPE;
+                }
+
+                struct template_parameters new_parameters = {0};
+
+                for (
+                    const struct template_parameter* param = params->parameters;
+                    param < params->parameters + params->length;
+                    param++
+                ) {
+                    if (strcmp(param->name.data, p_node->var.data) != 0) {
+                        append_template_parameter(&new_parameters, param);
+                    }
+                }
+
+                for (
+                    const struct string* list_item = list_variable->list.strings;
+                    list_item < list_variable->list.strings + list_variable->list.length;
+                    list_item++
+                ) {
+                    append_template_parameter(&new_parameters, &(struct template_parameter) {
+                        .name = p_node->var,
+                        .type = TEMPLATE_PARAMETER_TEXT,
+                        .text = *list_item,
+                    });
+
+                    render_children(&new_parameters);
+
+                    new_parameters.length -= 1;
+                }
+
+                /* We do this to avoid freeing the individual parameters, as we don't own them here! */
+                new_parameters.length = 0;
+                free_template_parameters(&new_parameters);
+            }
     }
 
-    for (
-        const struct template_node* node = p_node->children, *previous_node = NULL;
-        node < p_node->children + p_node->children_length;
-        node++, previous_node = node - 1
-    ) {
-        const enum error result = render_node(node, previous_node, params, p_target);
-
-        if (result != INTERESTING_ERROR_SUCCESS) {
-            return result;
-        }
-    }
+    #undef render_children
 
     return INTERESTING_ERROR_SUCCESS;
 }
