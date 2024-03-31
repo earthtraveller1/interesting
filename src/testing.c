@@ -170,6 +170,38 @@ static bool template_rendering_test(void) {
     return true;
 }
 
+static bool template_rendering_test_for_if(void) {
+    const char* template_str =
+        "%{{ if $neng_is_alive }}%\n"
+        "    Neng is alive!\n"
+        "%{{ end }}%%{{ else }}%\n"
+        "    Neng is dead!\n"
+        "%{{ end }}%";
+
+    const struct template template = parse_template(template_str);
+
+    struct template_parameters parameters = {0};
+    append_template_parameter(&parameters, &(struct template_parameter) {
+        .name = new_string("neng_is_alive"),
+        .type = TEMPLATE_PARAMETER_BOOLEAN,
+        .boolean = true,
+    });
+
+    struct string result = render_template(&template, &parameters);
+    test_assert(strcmp(result.data, "\n    Neng is alive!\n") == 0);
+
+    free_string(&result);
+    memset(&result, 0, sizeof result);
+
+    parameters.parameters[0].boolean = false;
+    result = render_template(&template, &parameters);
+    test_assert(strcmp(result.data, "\n    Neng is dead!\n") == 0);
+
+    free_string(&result);
+
+    return true;
+}
+
 int run_tests(void) {
     run_test(http_parser_test);
     run_test(router_test);
@@ -179,6 +211,7 @@ int run_tests(void) {
     run_test(template_parsing_test_for_for);
     run_test(template_parsing_test_for_else);
     run_test(template_rendering_test);
+    run_test(template_rendering_test_for_if);
 
     return 0;
 }
