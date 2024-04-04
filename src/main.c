@@ -27,8 +27,6 @@
 static struct http_server global_server;
 static struct router global_router;
 
-static struct string global_404_page;
-
 static struct template global_name_template;
 
 static void interrupt_handler(int signal) {
@@ -113,12 +111,6 @@ int main(int argc, char** argv) {
     add_route_handler(&global_router, "/neng", neng_handler);
     add_route_handler(&global_router, "/name/{name}", name_handler);
 
-    const struct string_error page_404 = read_string_from_file("pages/404.html");
-    if (page_404.error != INTERESTING_ERROR_SUCCESS) {
-        fprintf(stderr, "ERROR: Failed to read 404 page\n");
-        return 1;
-    }
-
     const struct template_error name_template = parse_template_from_file("pages/name.html");
     if (name_template.error != INTERESTING_ERROR_SUCCESS) {
         fprintf(stderr, "ERROR: Failed to parse template\n");
@@ -127,7 +119,6 @@ int main(int argc, char** argv) {
     global_name_template = name_template.template;
 
     global_server = http_server.server;
-    global_404_page = page_404.string;
 
     global_server.on_request = on_request;
     global_server.user_data = &global_router;
