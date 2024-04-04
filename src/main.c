@@ -16,6 +16,7 @@
 #include "common.h"
 #include "http.h"
 #include "router.h"
+#include "templates.h"
 
 #ifdef INTERESTING_BUILD_TESTS
 #include "testing.h"
@@ -27,6 +28,8 @@ static struct http_server global_server;
 static struct router global_router;
 
 static struct string global_404_page;
+
+static struct template global_name_template;
 
 static void interrupt_handler(int signal) {
     (void)signal;
@@ -72,6 +75,29 @@ static struct http_response neng_handler(const struct parameters* parameters, co
     };
 }
 
+static struct http_response name_handler(const struct parameters* parameters, const struct http_request* request, void* user_data) {
+    (void)user_data;
+    (void)request;
+
+    struct template_parameters template_parameters = {0};
+    append_template_parameter(&template_parameters, &(struct template_parameter) {
+        .name = new_string("name"),
+        .type = TEMPLATE_PARAMETER_TEXT,
+        .text = new_string(get_parameter(parameters, "name")->data),
+    });
+
+    const struct string result = render_template(&global_name_template, &template_parameters);
+
+    free_template_parameters(&template_parameters);
+
+    return (struct http_response) {
+        .status = "200 OK",
+        .content_type = "text/html",
+        .content_length = result.length - 1,
+        .body = result,
+    };
+}
+
 int main(int argc, char** argv) {
 #ifdef INTERESTING_BUILD_TESTS
     if (argc > 1 && strcmp(argv[1], "test") == 0) {
@@ -85,11 +111,20 @@ int main(int argc, char** argv) {
 
     add_route_handler(&global_router, "/", index_handler);
     add_route_handler(&global_router, "/neng", neng_handler);
+    add_route_handler(&global_router, "/name/{name}", name_handler);
 
     const struct string_error page_404 = read_string_from_file("pages/404.html");
     if (page_404.error != INTERESTING_ERROR_SUCCESS) {
+        fprintf(stderr, "ERROR: Failed to read 404 page\n");
         return 1;
     }
+
+    const struct template_error name_template = parse_template_from_file("pages/name.html");
+    if (name_template.error != INTERESTING_ERROR_SUCCESS) {
+        fprintf(stderr, "ERROR: Failed to parse template\n");
+        return 1;
+    }
+    global_name_template = name_template.template;
 
     global_server = http_server.server;
     global_404_page = page_404.string;
