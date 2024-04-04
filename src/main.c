@@ -24,23 +24,26 @@
 
 #define PORT 6969
 
-static struct http_server global_server;
-static struct router global_router;
+struct application {
+    struct http_server server;
+    struct router router;
+    struct template name_template;
+};
 
-static struct template global_name_template;
+static struct application* interrupt_handler_application = NULL;
 
 static void interrupt_handler(int signal) {
     (void)signal;
 
     fprintf(stderr, "Closing server...\n");
-    free_http_server(&global_server);
-    free_router(&global_router);
+    free_http_server(&interrupt_handler_application->server);
+    free_router(&interrupt_handler_application->router);
     exit(0);
 }
 
 static struct http_response on_request(const struct http_request* request, void* user_data) {
-    const struct router* router = (const struct router*)user_data;
-    return route_request(router, request);
+    const struct application* application = (struct application*)user_data;
+    return route_request(&application->router, request);
 }
 
 static struct http_response index_handler(const struct parameters* parameters, const struct http_request* request, void* user_data) {
@@ -74,8 +77,9 @@ static struct http_response neng_handler(const struct parameters* parameters, co
 }
 
 static struct http_response name_handler(const struct parameters* parameters, const struct http_request* request, void* user_data) {
-    (void)user_data;
     (void)request;
+
+    const struct application* application = (const struct application*)user_data;
 
     struct template_parameters template_parameters = {0};
     append_template_parameter(&template_parameters, &(struct template_parameter) {
@@ -84,7 +88,7 @@ static struct http_response name_handler(const struct parameters* parameters, co
         .text = new_string(get_parameter(parameters, "name")->data),
     });
 
-    const struct string result = render_template(&global_name_template, &template_parameters);
+    const struct string result = render_template(&application->name_template, &template_parameters);
 
     free_template_parameters(&template_parameters);
 
@@ -102,28 +106,33 @@ int main(int argc, char** argv) {
         return run_tests();
     }
 #endif
+    struct application application = {0};
+
     struct http_server_error http_server = create_http_server(PORT, 0);
     if (http_server.error != INTERESTING_ERROR_SUCCESS) {
         return 1;
     }
 
-    add_route_handler(&global_router, "/", index_handler);
-    add_route_handler(&global_router, "/neng", neng_handler);
-    add_route_handler(&global_router, "/name/{name}", name_handler);
+    application.server = http_server.server;
+    application.server.on_request = on_request;
+    application.server.user_data = &application;
+
+    add_route_handler(&application.router, "/", index_handler);
+    add_route_handler(&application.router, "/neng", neng_handler);
+    add_route_handler(&application.router, "/name/{name}", name_handler);
+
+    application.router.user_data = &application;
 
     const struct template_error name_template = parse_template_from_file("pages/name.html");
     if (name_template.error != INTERESTING_ERROR_SUCCESS) {
         fprintf(stderr, "ERROR: Failed to parse template\n");
         return 1;
     }
-    global_name_template = name_template.template;
-
-    global_server = http_server.server;
-
-    global_server.on_request = on_request;
-    global_server.user_data = &global_router;
     
+    application.name_template = name_template.template;
+    
+    interrupt_handler_application = &application;
     signal(SIGINT, interrupt_handler);
 
-    return run_http_server(&global_server);
+    return run_http_server(&application.server);
 }
