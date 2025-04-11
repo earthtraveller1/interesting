@@ -22,7 +22,7 @@
 #include "testing.h"
 #endif
 
-#define PORT 5000
+#define PORT 6969
 
 struct application {
     struct http_server server;
